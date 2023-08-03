@@ -1,0 +1,31 @@
+# Binaries for programs and plugins
+main
+v_crypto_bot
+*.exe
+*.exe~
+*.so
+*.dylib
+*.dll
+
+# Ignore binary output folders
+bin/
+
+# Ignore common editor/system specific metadata
+.DS_Store
+.idea/
+.vscode/
+*.iml
+
+# ENV
+.env
+
+# vweb and database
+*.db
+*.js
+
+# Ignore config files
+bot_config*
+
+# Ignore logs and state
+logs/
+state
