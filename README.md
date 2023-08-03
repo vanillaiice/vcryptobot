@@ -24,6 +24,7 @@ API_KEY = "<YOUR API KEY>"
 
 - **tradingBalance**, the bot's trading allowance.
 > example value for BTC: 0.0025 
+
 > example value for TRX: 500
 
 - **firstTx**, the type of the first transaction the bot will execute.
@@ -43,10 +44,12 @@ API_KEY = "<YOUR API KEY>"
 
 - **wsServerUrl**, URL of the websocket server .
 > example URL for testnet server: "wss://testnet.binance.vision/ws-api/v3"
+
 > example URL for normal server: "wss://ws-api.binance.com:443/ws-api/v3"
 
 - **serverUrl**, URL of the Spot API server.
 > example URL for testnet server: "https://testnet.binance.vision/api/v3"
+
 > example URL for normal server: "https://api.binance.com/api/v3"
 
 - **base**, base currency of the trading pair.
