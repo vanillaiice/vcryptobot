@@ -39,6 +39,9 @@ API_KEY = "<YOUR API KEY>"
 - **sellMargin**, the margin at which the bot should sell an asset (difference between last buy price and current price).
 > example value in %: 0.1
 
+- **stopLossMargin**, the margin at which the bot should sell an asset if the price decreases compared to the last buy price (difference between last buy price and current price).
+> example value in %: 0.05
+
 - **decisionIntervalMs**, the time in milliseconds at which the bot will decide to buy or sell.
 > example value in ms: 1500
 
