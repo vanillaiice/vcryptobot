@@ -34,13 +34,13 @@ API_KEY = "<YOUR API KEY>"
 > accepted values: true or false
 
 - **buyMargin**, the margin at which the bot should buy an asset (difference between last sell price and current price).
-> example value in %: 0.1
+> example value in %: 5.0
 
 - **sellMargin**, the margin at which the bot should sell an asset (difference between last buy price and current price).
-> example value in %: 0.1
+> example value in %: 5.0
 
 - **stopLossMargin**, the margin at which the bot should sell an asset if the price decreases compared to the last buy price (difference between last buy price and current price).
-> example value in %: 0.05
+> example value in %: 2.5
 
 - **decisionIntervalMs**, the time in milliseconds at which the bot will decide to buy or sell.
 > example value in ms: 1500
