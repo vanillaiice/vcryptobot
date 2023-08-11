@@ -155,7 +155,7 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client 
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
 		if delta <= bot_config.stop_loss_margin {
-			bot_data.logger.warn('BOT: Activating STOP LOSS ORDER, price difference ${delta}%')
+			bot_data.logger.warn('BOT: Activating STOP LOSS ORDER, price difference @${delta}%')
 			sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 		} else {
 			bot_data.logger.info('BOT: Not selling, price difference @${delta}%')
