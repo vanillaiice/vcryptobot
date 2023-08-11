@@ -136,20 +136,20 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 }
 
 fn try_buy_tx(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	diff, res := check_price_diff(bot_data.last_sell_price, current_price, bot_config.buy_margin)
+	delta, res := check_price_delta(bot_data.last_sell_price, current_price, bot_config.buy_margin)
 	if res == true {
 		buy(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		bot_data.logger.info('BOT: Not Buying, price diff @${diff}%')
+		bot_data.logger.info('BOT: Not Buying, price difference @${delta}%')
 	}
 }
 
 fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	diff, res := check_price_diff(current_price, bot_data.last_buy_price, bot_config.sell_margin)
+	delta, res := check_price_delta(current_price, bot_data.last_buy_price, bot_config.sell_margin)
 	if res == true {
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		bot_data.logger.info('BOT: Not selling, price diff @${diff}%')
+		bot_data.logger.info('BOT: Not selling, price difference @${delta}%')
 	}
 }
 
@@ -226,7 +226,7 @@ fn get_last_profit_from_db(mut db sqlite.DB) f32 {
 	}
 }
 
-fn check_price_diff(a f32, b f32, c f32) (f32, bool) {
-	diff := ((a - b) / a * 100)
-	return diff, diff >= c
+fn check_price_delta(a f32, b f32, c f32) (f32, bool) {
+	delta := ((a - b) / a * 100)
+	return delta, delta >= c
 }
