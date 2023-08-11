@@ -20,15 +20,16 @@ struct State {
 }
 
 pub struct BotConfig {
-	trading_balance f32    [json: tradingBalance]
-	buy_margin      f32    [json: buyMargin]
-	sell_margin     f32    [json: sellMargin]
-	first_tx        LastTx [json: firstTx]
-	skip_first_tx   bool   [json: skipFirstTx]
+	trading_balance  f32    [json: tradingBalance]
+	buy_margin       f32    [json: buyMargin]
+	sell_margin      f32    [json: sellMargin]
+	stop_loss_margin f32    [json: stopLossMargin]
+	first_tx         LastTx [json: firstTx]
+	skip_first_tx    bool   [json: skipFirstTx]
 pub:
+	decision_interval_ms int    [json: decisionIntervalMs]
 	output_target        string [json: outputTarget]
 	log_level            string [json: logLevel]
-	decision_interval_ms int    [json: decisionIntervalMs]
 	ws_server_url        string [json: wsServerUrl]
 	server_url           string [json: serverUrl]
 	base                 string
@@ -102,8 +103,12 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 			.first {
 				if bot_config.skip_first_tx == false {
 					match bot_config.first_tx {
-						.buy { buy(mut bot_data, mut last_price, mut binance_client, bot_config)! }
-						.sell { sell(mut bot_data, mut last_price, mut binance_client, bot_config)! }
+						.buy {
+							buy(mut bot_data, mut last_price, mut binance_client, bot_config)!
+						}
+						.sell {
+							sell(mut bot_data, mut last_price, mut binance_client, bot_config)!
+						}
 						else {}
 					}
 				} else {
@@ -149,7 +154,12 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client 
 	if res == true {
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		bot_data.logger.info('BOT: Not selling, price difference @${delta}%')
+		if delta <= bot_config.stop_loss_margin {
+			bot_data.logger.warn('BOT: Activating STOP LOSS ORDER, price difference ${delta}%')
+			sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
+		} else {
+			bot_data.logger.info('BOT: Not selling, price difference @${delta}%')
+		}
 	}
 }
 
@@ -159,7 +169,7 @@ fn buy(mut bot_data BotData, mut current_price &f32, mut binance_client binance.
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
 	if order_status != 'FILLED' {
-		bot_data.logger.error('BOT: order request returned with status ${order_status}\n${order_resp}')
+		bot_data.logger.error('BOT: Order request returned with status ${order_status}\n${order_resp}')
 	} else {
 		last_profit := get_last_profit_from_db(mut bot_data.db)
 
@@ -187,7 +197,7 @@ fn sell(mut bot_data BotData, mut current_price &f32, mut binance_client binance
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
 	if order_status != 'FILLED' {
-		bot_data.logger.error('BOT: order request returned with status ${order_status}\n${order_resp}')
+		bot_data.logger.error('BOT: Order request returned with status ${order_status}\n${order_resp}')
 	} else {
 		profit := (*current_price - bot_data.last_buy_price) * (bot_config.trading_balance)
 		last_profit := get_last_profit_from_db(mut bot_data.db)
