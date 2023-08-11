@@ -3,7 +3,7 @@ module logger
 import os
 import log
 
-pub fn new(log_level string, output_target string, base string, quote string)! &log.Log {
+pub fn new(log_level string, output_target string, base string, quote string) !&log.Log {
 	level := log.level_from_tag(log_level.to_upper()) or {
 		eprintln('Invalid value for log level (fatal, error, warn, info, debug)')
 		exit(1)

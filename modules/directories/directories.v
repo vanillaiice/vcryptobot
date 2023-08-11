@@ -3,7 +3,7 @@ module directories
 import log
 import os
 
-pub fn setup(mut logger &log.Log) {
+pub fn setup(mut logger log.Log) {
 	dirs := [
 		'db/prices',
 		'db/tx_history',
