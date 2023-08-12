@@ -10,11 +10,13 @@ import prices
 import bot
 import config
 import directories
+import metadata
 
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
-	fp.version('v0.2.0')
-	fp.description('Simple trading bot using Binance API')
+	fp.application(metadata.name)
+	fp.version(metadata.version)
+	fp.description(metadata.description)
 	fp.usage_example('vbot --config config.json')
 	mut config_file := fp.string('config', `c`, '', '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
 	fp.finalize()!
