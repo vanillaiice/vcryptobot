@@ -13,7 +13,7 @@ import directories
 
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
-	fp.version('v0.1.0')
+	fp.version('v0.2.0')
 	fp.description('Simple trading bot using Binance API')
 	fp.usage_example('vbot --config config.json')
 	mut config_file := fp.string('config', `c`, '', '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
