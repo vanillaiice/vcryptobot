@@ -72,22 +72,23 @@ API_KEY = "<YOUR API KEY>"
 ```
 > git clone https://github.com/vanillaiice/v-crypto-bot
 > cd v-crypto-bot
+> v install
 > v .
 // or
-> make
+> mkdir bin && make
 ```
 
 ## Development dependencies
 
 - v
 - sqlite
-- zzktm.vdotenv
+- [zztkm.vdotenv](https://github.com/zztkm/vdotenv)
 - make (optional)
 - MinGW-w64 (optional, for windows cross compilation)
 
 ## Acknowledgments
 
-- [zzktm.vdotenv](https://github.com/zztkm/vdotenv), MIT License
+- [zztkm.vdotenv](https://github.com/zztkm/vdotenv), MIT License
 
 ## Disclaimer
 
