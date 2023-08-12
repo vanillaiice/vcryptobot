@@ -96,7 +96,7 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 		create table TxHistory
 	}!
 
-	logger.warn('BOT: Trading ${bot_config.trading_balance} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin}%, SELL margin @${bot_config.sell_margin}% current price @${last_price} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${bot_config.trading_balance} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin}%, SELL margin @${bot_config.sell_margin}% current price @${last_price} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.last_tx {
@@ -145,7 +145,7 @@ fn try_buy_tx(mut bot_data BotData, mut current_price &f32, mut binance_client b
 	if res == true {
 		buy(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		bot_data.logger.info('BOT: Not Buying, price difference @${delta}%')
+		bot_data.logger.info('BOT: not buying, price difference @${delta}%')
 	}
 }
 
@@ -155,21 +155,21 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client 
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
 		if delta <= bot_config.stop_loss_margin {
-			bot_data.logger.warn('BOT: Activating STOP LOSS ORDER, price difference @${delta}%')
+			bot_data.logger.warn('BOT: activating STOP LOSS ORDER, price difference @${delta}%')
 			sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 		} else {
-			bot_data.logger.info('BOT: Not selling, price difference @${delta}%')
+			bot_data.logger.info('BOT: not selling, price difference @${delta}%')
 		}
 	}
 }
 
 fn buy(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	bot_data.logger.warn('BOT: Buying, price @${current_price}, last sell price @${bot_data.last_sell_price}')
+	bot_data.logger.warn('BOT: buying, price @${current_price}, last sell price @${bot_data.last_sell_price}')
 
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
 	if order_status != 'FILLED' {
-		bot_data.logger.error('BOT: Order request returned with status ${order_status}\n${order_resp}')
+		bot_data.logger.error('BOT: order request returned with status ${order_status}\n${order_resp}')
 	} else {
 		last_profit := get_last_profit_from_db(mut bot_data.db)
 
@@ -192,12 +192,12 @@ fn buy(mut bot_data BotData, mut current_price &f32, mut binance_client binance.
 }
 
 fn sell(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	bot_data.logger.warn('BOT: Selling, price @${current_price}, last buy price @${bot_data.last_buy_price}')
+	bot_data.logger.warn('BOT: selling, price @${current_price}, last buy price @${bot_data.last_buy_price}')
 
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
 	if order_status != 'FILLED' {
-		bot_data.logger.error('BOT: Order request returned with status ${order_status}\n${order_resp}')
+		bot_data.logger.error('BOT: order request returned with status ${order_status}\n${order_resp}')
 	} else {
 		profit := (*current_price - bot_data.last_buy_price) * (bot_config.trading_balance)
 		last_profit := get_last_profit_from_db(mut bot_data.db)
