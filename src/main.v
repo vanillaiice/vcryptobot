@@ -17,7 +17,7 @@ fn main() {
 	fp.application(metadata.name)
 	fp.version(metadata.version)
 	fp.description(metadata.description)
-	fp.usage_example('vbot --config config.json')
+	fp.usage_example('vcryptobot --config config.json')
 	mut config_file := fp.string('config', `c`, '', '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
 	fp.finalize()!
 

@@ -6,7 +6,7 @@ This Bot buys and sells crypto at user specified margins.
 ## Usage
 
 ```
-vbot --config <PATH TO CONFIG.JSON>
+vcryptobot --config <PATH TO CONFIG.JSON>
 ```
 
 - Omitting the ```--config``` option will trigger the config file creation interactive prompt.
