@@ -27,7 +27,7 @@ API_KEY = "<YOUR API KEY>"
 - make (optional)
 - MinGW-w64 (optional, for windows cross compilation)
 
-# Installation
+## Installation
 
 First, make sure that you have [V](https://github.com/vlang/v/blob/master/README.md#installing-v-from-source) and [sqlite](https://modules.vlang.io/db.sqlite.html) installed on your machine. Then, you can do the following:
 
