@@ -12,6 +12,11 @@ import config
 import directories
 import metadata
 
+const (
+	n = 'n'
+	no = 'no'
+)
+
 fn main() {
 	mut fp := flag.new_flag_parser(os.args)
 	fp.application(metadata.name)
@@ -26,7 +31,7 @@ fn main() {
 	if config_file == '' {
 		ans := os.input('config file not provided, create one ? (y/N)\n-> ').to_lower()
 
-		if ans == 'n' || ans == 'no' {
+		if ans == n || ans == no {
 			println('not creating config file, exiting')
 			exit(1)
 		}
@@ -47,7 +52,7 @@ fn main() {
 	if os.exists('.env') == false {
 		ans := os.input('.env file found, create one ? (y/N)\n-> ').to_lower()
 
-		if ans == 'n' || ans == 'no' {
+		if ans == n || ans == no {
 			println('not creating .env file, exiting')
 			exit(1)
 		}
