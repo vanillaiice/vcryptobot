@@ -25,7 +25,7 @@ struct Result {
 }
 
 pub fn start(server_url string, refresh_time_ms int, base string, quote string, ch chan bool, mut logger log.Log, mut last_price &f32, mut last_price_timestamp &i64) ! {
-	mut db := sqlite.connect('db/prices/prices_${base.to_lower()}_${quote.to_lower()}.db') or {
+	mut db := sqlite.connect('db/prices/${base.to_lower()}_${quote.to_lower()}.db') or {
 		logger.error('PRICES: error opening db')
 		exit(1)
 	}
@@ -55,7 +55,7 @@ pub fn start(server_url string, refresh_time_ms int, base string, quote string, 
 
 	spawn fetch_price(mut ws, refresh_time_ms, base + quote)
 	spawn update_data(mut logger, mut last_price, mut last_price_timestamp, refresh_time_ms + 125,
-		ch, base, quote)
+		ch, base, quote, mut &db)
 
 	ws.listen()!
 }
@@ -119,12 +119,7 @@ fn handle_message(msg string, mut last_price &f32, mut logger log.Log, mut db sq
 	}
 }
 
-fn update_data(mut logger log.Log, mut last_price &f32, mut last_price_timestamp &i64, refresh_time_ms int, ch chan bool, base string, quote string) {
-	mut db := sqlite.connect('db/prices/prices_${base.to_lower()}_${quote.to_lower()}.db') or {
-		logger.error('PRICES: error opening db')
-		exit(1)
-	}
-
+fn update_data(mut logger log.Log, mut last_price &f32, mut last_price_timestamp &i64, refresh_time_ms int, ch chan bool, base string, quote string, mut db sqlite.DB) {
 	for {
 		mut p, mut t := get_latest_price_from_db(mut db)
 

@@ -57,7 +57,7 @@ struct TxHistory {
 }
 
 pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan bool, mut last_price &f32, mut logger log.Log) ! {
-	state_file_path := 'state/state_${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.json'
+	state_file_path := 'state/${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.json'
 
 	if os.exists(state_file_path) == false {
 		logger.warn('BOT: creating state file.')
@@ -74,7 +74,7 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 	state_file := os.read_file(state_file_path)!
 	state := json.decode(State, state_file)!
 
-	mut db := sqlite.connect('db/tx_history/tx_history_${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.db') or {
+	mut db := sqlite.connect('db/tx_history/${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.db') or {
 		logger.error('BOT: error opening db')
 		exit(1)
 	}
