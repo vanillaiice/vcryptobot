@@ -96,7 +96,7 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 		create table TxHistory
 	}!
 
-	logger.warn('BOT: trading ${bot_config.trading_balance} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin}%, SELL margin @${bot_config.sell_margin}% current price @${last_price} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${bot_config.trading_balance} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin}%, SELL margin @${bot_config.sell_margin}%, STOP LOSS margin @${bot_config.stop_loss_margin}, current price @${last_price} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.last_tx {
@@ -154,7 +154,7 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client 
 	if res == true {
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		if delta <= bot_config.stop_loss_margin {
+		if delta <= -bot_config.stop_loss_margin {
 			bot_data.logger.warn('BOT: activating STOP LOSS ORDER, price difference @${delta}%')
 			sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 		} else {
