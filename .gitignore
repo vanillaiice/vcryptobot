@@ -26,6 +26,9 @@ bin/
 # Ignore config files
 bot_config*
 
+# Ignore config files directory
+bot_config/
+
 # Ignore logs and state
 logs/
 state
