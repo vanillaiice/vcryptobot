@@ -44,8 +44,8 @@ pub fn start(server_url string, refresh_time_ms int, base string, quote string, 
 		}
 	}
 
-	db.synchronization_mode(sqlite.SyncMode.off)
-	db.journal_mode(sqlite.JournalMode.memory)
+	db.synchronization_mode(sqlite.SyncMode.off)!
+	db.journal_mode(sqlite.JournalMode.memory)!
 
 	sql db {
 		create table Prices
@@ -144,9 +144,9 @@ fn update_data(mut logger log.Log, mut last_price &f32, mut last_price_timestamp
 }
 
 fn get_latest_price_from_db(mut db sqlite.DB) (f32, i64) {
-	row, code := db.exec('select * from prices order by id desc limit 1')
+	row := db.exec('select * from prices order by id desc limit 1') or { return 0, 0 }
 
-	if code == 101 && row.len > 0 {
+	if row.len > 0 {
 		p, t := row[0].vals[1].f32(), row[0].vals[2].i64()
 		return p, t
 	} else {
