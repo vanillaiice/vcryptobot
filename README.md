@@ -37,15 +37,7 @@ First, make sure that you have [V](https://github.com/vlang/v/blob/master/README
 > v install
 > v .
 // or
-> mkdir bin
-// compile for linux
-> make linux
-// compile for windows
-> make windows
-// compile for both
 > make
-// or
-> make all
 ```
 
 ## Config File
