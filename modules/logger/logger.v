@@ -23,7 +23,7 @@ pub fn new(log_level string, output_target string, base string, quote string) !&
 			os.mkdir('logs')!
 		}
 
-		logger.set_full_logpath('logs/log_${base.to_lower()}_${quote.to_lower()}.txt')
+		logger.set_full_logpath('logs/${base.to_lower()}_${quote.to_lower()}.txt')
 
 		if target == .both {
 			logger.log_to_console_too()
