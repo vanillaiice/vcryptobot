@@ -20,6 +20,34 @@ API_KEY = "<YOUR API KEY>"
 - If the .env file is not present, the .env file creation interactive prompt will be trigerred.
 - **Testnet** secret and api keys can be created at https://testnet.binance.vision/
 
+## Dependencies
+
+- sqlite
+- [zztkm.vdotenv](https://github.com/zztkm/vdotenv)
+- make (optional)
+- MinGW-w64 (optional, for windows cross compilation)
+
+# Installation
+
+First, make sure that you have [V](https://github.com/vlang/v/blob/master/README.md#installing-v-from-source) and [sqlite](https://modules.vlang.io/db.sqlite.html) installed on your machine. Then, you can do the following:
+
+```
+> git clone https://github.com/vanillaiice/v-crypto-bot
+> cd v-crypto-bot
+> v install
+> v .
+// or
+> mkdir bin
+// compile for linux
+> make linux
+// compile for windows
+> make windows
+// compile for both
+> make
+// or
+> make all
+```
+
 ## Config File
 
 - **tradingBalance**, the bot's trading allowance.
@@ -66,25 +94,6 @@ API_KEY = "<YOUR API KEY>"
 
 - **outputTarget**, output target of the content of the bot's log.
 > accepted values: "console", "file", "both"
-
-# Installation
-
-```
-> git clone https://github.com/vanillaiice/v-crypto-bot
-> cd v-crypto-bot
-> v install
-> v .
-// or
-> mkdir bin && make
-```
-
-## Development dependencies
-
-- v
-- sqlite
-- [zztkm.vdotenv](https://github.com/zztkm/vdotenv)
-- make (optional)
-- MinGW-w64 (optional, for windows cross compilation)
 
 ## Acknowledgments
 
