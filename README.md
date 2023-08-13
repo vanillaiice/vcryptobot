@@ -22,7 +22,7 @@ API_KEY = "<YOUR API KEY>"
 
 ## Dependencies
 
-- sqlite
+- [sqlite](https://modules.vlang.io/db.sqlite.html)
 - [zztkm.vdotenv](https://github.com/zztkm/vdotenv)
 - make (optional)
 - MinGW-w64 (optional, for windows cross compilation)
