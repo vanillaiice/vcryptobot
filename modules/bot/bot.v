@@ -221,7 +221,7 @@ fn sell(mut bot_data BotData, mut current_price &f32, mut binance_client binance
 }
 
 fn get_last_profit_from_db(mut db sqlite.DB) f32 {
-	row := db.exec('select * from prices order by id desc limit 1') or { return 0 }
+	row := db.exec('select * from tx_history order by id desc limit 1') or { return 0 }
 
 	// return error instead of 0 ?
 	if row.len != 0 {
