@@ -96,7 +96,7 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 		create table TxHistory
 	}!
 
-	logger.warn('BOT: trading ${bot_config.trading_balance:.3f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin:.3f}%, SELL margin @${bot_config.sell_margin:.3f}%, STOP LOSS margin @${bot_config.stop_loss_margin:.3f}, current price @${*(last_price):.3f} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${bot_config.trading_balance:.3f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin:.3f}%, SELL margin @${bot_config.sell_margin:.3f}%, STOP LOSS margin @${bot_config.stop_loss_margin:.3f}%, current price @${*(last_price):.3f} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.last_tx {
