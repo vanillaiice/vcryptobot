@@ -16,12 +16,10 @@ struct Prices {
 struct Price {
 	id     string
 	status int
-	result Result
-}
-
-struct Result {
-	symbol string
-	price  string
+	result struct {
+		symbol string
+		price  string
+	}
 }
 
 pub fn start(server_url string, refresh_time_ms int, base string, quote string, ch chan bool, mut logger log.Log, mut last_price &f32, mut last_price_timestamp &i64) ! {
@@ -30,7 +28,11 @@ pub fn start(server_url string, refresh_time_ms int, base string, quote string, 
 		exit(1)
 	}
 
-	mut ws := websocket.new_client(server_url, unsafe { websocket.ClientOpt{ logger: logger } })!
+	mut ws := websocket.new_client('wss://${server_url}/ws-api/v3', unsafe {
+		websocket.ClientOpt{
+			logger: logger
+		}
+	})!
 
 	defer {
 		db.close() or {
@@ -127,7 +129,7 @@ fn update_data(mut logger log.Log, mut last_price &f32, mut last_price_timestamp
 			last_price = p
 			last_price_timestamp = t
 			if ch.closed == false {
-				logger.info('PRICES: READY')
+				logger.info('PRICES: ready')
 				ch <- true
 			}
 		} else {

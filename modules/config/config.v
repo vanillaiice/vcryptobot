@@ -6,29 +6,29 @@ pub fn new() string {
 	default_decision_interval_ms := '5000'
 	default_first_tx := 'buy'
 	default_skip_first_tx := 'false'
-	default_server_url := 'https://testnet.binance.vision/api/v3'
-	default_ws_server_url := 'wss://testnet.binance.vision/ws-api/v3'
+	default_server_base_endpoint := 'testnet.binance.vision'
 	default_output_target := 'both'
 	default_log_level := 'info'
 	default_stop_loss_margin := '0.0'
 
-	base := is_letter_only(is_not_empty_str(input('Enter base currency symbol:\n-> ').to_upper(), "Base currency"))
-	quote := is_letter_only(is_not_empty_str(input('Enter quote currency symbol:\n-> ').to_upper(), "Quote currency"))
-	trading_balance := is_float(is_not_empty_str(input('Enter bot trading balance:\n-> '), "Trading balance"))
+	base := is_letter_only(is_not_empty_str(input('Enter base currency symbol:\n-> ').to_upper(),
+		'Base currency'))
+	quote := is_letter_only(is_not_empty_str(input('Enter quote currency symbol:\n-> ').to_upper(),
+		'Quote currency'))
+	trading_balance := is_float(is_not_empty_str(input('Enter bot trading balance:\n-> '),
+		'Trading balance'))
 	first_tx := is_tx(return_default(input('Enter type of first transaction (buy or sell), default ${default_first_tx}:\n-> '),
 		default_first_tx))
 	skip_first_tx := is_yes_no(return_default(input('Skip first transaction (y/N) ? (default ${default_skip_first_tx}):\n-> '),
 		default_skip_first_tx))
-	buy_margin := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '), "Buy margin"))
-	sell_margin := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '), "Sell margin"))
+	buy_margin := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '), 'Buy margin'))
+	sell_margin := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '), 'Sell margin'))
 	stop_loss_margin := is_float(return_default(input('Enter stop loss margin (%), default ${default_stop_loss_margin}%:\n-> '),
 		default_stop_loss_margin))
 	decision_interval_ms := is_int(return_default(input('Enter price refresh time (milliseconds), default ${default_decision_interval_ms}:\n-> '),
 		default_decision_interval_ms))
-	server_url := return_default(input('Enter server url (default ${default_server_url}):\n-> '),
-		default_server_url)
-	ws_server_url := return_default(input('Enter websocket server url (default ${default_ws_server_url}):\n-> '),
-		default_ws_server_url)
+	server_base_endpoint := return_default(input('Enter server base endpoint (default ${default_server_base_endpoint}):\n-> '),
+		default_server_base_endpoint)
 	output_target := is_output_target(return_default(input('Enter log output target (console, file, both), default ${default_output_target}:\n-> '),
 		default_output_target))
 	log_level := is_log_level(return_default(input('Enter log level (fatal, error, warn, info, debug), default ${default_log_level}:\n-> '),
@@ -44,8 +44,7 @@ pub fn new() string {
     "sellMargin": ${sell_margin},
     "stopLossMargin": ${stop_loss_margin},
     "decisionIntervalMs": ${decision_interval_ms},
-    "serverUrl": "${server_url}",
-    "wsServerUrl": "${ws_server_url}",
+    "serverBaseEndpoint": "${server_base_endpoint}",
     "outputTarget": "${output_target}",
     "logLevel": "${log_level}"
   }'
@@ -61,7 +60,7 @@ fn return_default(value string, default_value string) string {
 
 fn is_not_empty_str(str string, description string) string {
 	if str == '' {
-		eprintln("${description} cannot be empty, exiting")
+		eprintln('${description} cannot be empty, exiting')
 		exit(1)
 	}
 

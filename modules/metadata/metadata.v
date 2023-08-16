@@ -2,8 +2,8 @@ module metadata
 
 import v.vmod
 
-const manifest = vmod.from_file('v.mod') or { 
-	eprintln(err) 
+const manifest = vmod.from_file('v.mod') or {
+	eprintln(err)
 	exit(1)
 }
 

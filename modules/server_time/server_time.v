@@ -8,16 +8,18 @@ import log
 struct Time {
 	id     string
 	status int
-	result Result
-}
-
-struct Result {
-	server_time i64 [json: serverTime]
+	result struct {
+		server_time i64 [json: serverTime]
+	}
 }
 
 // start starts the websocket connection
 pub fn start(server_url string, timestamp_refresh_ms int, ch chan int, mut logger log.Log, mut server_timestamp &i64) ! {
-	mut ws := websocket.new_client(server_url, unsafe { websocket.ClientOpt{ logger: logger } })!
+	mut ws := websocket.new_client('wss://${server_url}/ws-api/v3', unsafe {
+		websocket.ClientOpt{
+			logger: logger
+		}
+	})!
 
 	defer {
 		ws.close(0, 'SERVER TIME: closing websocket connection') or {

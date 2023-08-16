@@ -13,8 +13,9 @@ import directories
 import metadata
 
 const (
-	n = 'n'
+	n  = 'n'
 	no = 'no'
+	empty_str = ''
 )
 
 fn main() {
@@ -23,12 +24,12 @@ fn main() {
 	fp.version(metadata.version)
 	fp.description(metadata.description)
 	fp.usage_example('vcryptobot --config config.json')
-	mut config_file := fp.string('config', `c`, '', '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
+	mut config_file := fp.string('config', `c`, empty_str, '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
 	fp.finalize()!
 
 	mut bot_config := bot.BotConfig{}
 
-	if config_file == '' {
+	if config_file == empty_str {
 		ans := os.input('config file not provided, create one ? (y/N)\n-> ').to_lower()
 
 		if ans == n || ans == no {
@@ -50,7 +51,7 @@ fn main() {
 	}
 
 	if os.exists('.env') == false {
-		ans := os.input('.env file found, create one ? (y/N)\n-> ').to_lower()
+		ans := os.input('.env file not found, create one ? (y/N)\n-> ').to_lower()
 
 		if ans == n || ans == no {
 			println('not creating .env file, exiting')
@@ -69,7 +70,7 @@ fn main() {
 
 	for k in keys {
 		value := os.getenv(k)
-		if value != '' {
+		if value != empty_str {
 			keys_map[k] = value
 		} else {
 			eprintln("ERROR: value for '${k}' not found in .env file, exiting")
@@ -82,11 +83,14 @@ fn main() {
 
 	directories.setup(mut new_logger)
 
-	mut b := binance.new(bot_config.server_url, bot_config.base.to_upper() + bot_config.quote.to_upper(), keys_map)
+	mut b := binance.new(bot_config.server_base_endpoint, bot_config.base.to_upper() +
+		bot_config.quote.to_upper(), keys_map)
 	mut last_price, mut last_price_timestamp := f32(0), i64(0)
 	prices_ready := chan bool{}
 
-	spawn prices.start(bot_config.ws_server_url, bot_config.decision_interval_ms, bot_config.base, bot_config.quote, prices_ready, mut new_logger, mut &last_price, mut &last_price_timestamp)
+	spawn prices.start(bot_config.server_base_endpoint, bot_config.decision_interval_ms,
+		bot_config.base, bot_config.quote, prices_ready, mut new_logger, mut &last_price, mut
+		&last_price_timestamp)
 
 	bot.start(&bot_config, mut b, prices_ready, mut &last_price, mut new_logger)!
 }

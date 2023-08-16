@@ -30,8 +30,7 @@ pub:
 	decision_interval_ms int    [json: decisionIntervalMs]
 	output_target        string [json: outputTarget]
 	log_level            string [json: logLevel]
-	ws_server_url        string [json: wsServerUrl]
-	server_url           string [json: serverUrl]
+	server_base_endpoint string [json: serverBaseEndpoint]
 	base                 string
 	quote                string
 }
@@ -96,7 +95,7 @@ pub fn start(bot_config &BotConfig, mut binance_client binance.Binance, ch chan 
 		create table TxHistory
 	}!
 
-	logger.warn('BOT: trading ${bot_config.trading_balance:.3f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin:.3f}%, SELL margin @${bot_config.sell_margin:.3f}%, STOP LOSS margin @${bot_config.stop_loss_margin:.3f}%, current price @${*(last_price):.3f} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${bot_config.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.buy_margin:.5f}%, SELL margin @${bot_config.sell_margin:.5f}%, STOP LOSS margin @${bot_config.stop_loss_margin:.5f}%, current price @${*last_price:.5f} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.last_tx {
@@ -145,7 +144,7 @@ fn try_buy_tx(mut bot_data BotData, mut current_price &f32, mut binance_client b
 	if res == true {
 		buy(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
-		bot_data.logger.info('BOT: not buying, price difference @${delta:.3f}%')
+		bot_data.logger.info('BOT: not buying, price difference @${delta:.5f}%')
 	}
 }
 
@@ -155,16 +154,17 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut binance_client 
 		sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 	} else {
 		if delta <= -bot_config.stop_loss_margin {
-			bot_data.logger.warn('BOT: activating STOP LOSS ORDER, price difference @${delta:.3f}%')
+			// bot trading balance should be tx executed qty, as some money is lost
+			bot_data.logger.warn('BOT: activating STOP LOSS order, price difference @${delta:.5f}%')
 			sell(mut bot_data, mut current_price, mut binance_client, bot_config)!
 		} else {
-			bot_data.logger.info('BOT: not selling, price difference @${delta:.3f}%')
+			bot_data.logger.info('BOT: not selling, price difference @${delta:.5f}%')
 		}
 	}
 }
 
 fn buy(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	bot_data.logger.warn('BOT: buying, price @${*(current_price):.3f}, last sell price @${bot_data.last_sell_price:.3f}')
+	bot_data.logger.warn('BOT: buying, price @${*current_price:.5f}, last sell price @${bot_data.last_sell_price:.5f}')
 
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
@@ -192,7 +192,7 @@ fn buy(mut bot_data BotData, mut current_price &f32, mut binance_client binance.
 }
 
 fn sell(mut bot_data BotData, mut current_price &f32, mut binance_client binance.Binance, bot_config &BotConfig) ! {
-	bot_data.logger.warn('BOT: selling, price @${*(current_price):.3f}, last buy price @${bot_data.last_buy_price:.3f}')
+	bot_data.logger.warn('BOT: selling, price @${*current_price:.5f}, last buy price @${bot_data.last_buy_price:.5f}')
 
 	order_status, order_resp := binance_client.market_buy(bot_config.trading_balance.str())!
 
