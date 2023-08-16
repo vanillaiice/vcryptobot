@@ -1,7 +1,7 @@
 module binance
 
-import binance.order
-import binance.wallet
+import binance.spot.order
+import binance.spot.account
 import binance.server_time
 
 pub struct Binance {
@@ -30,8 +30,12 @@ pub fn (b Binance) market_sell(quantity string) !(string, string) {
 		quantity)!
 }
 
-pub fn (b Binance) account_info() !(wallet.Response, string) {
-	return wallet.spot_account_info(b.server_base_endpoint, b.secret_key, b.api_key)!
+pub fn (b Binance) account_info() !(account.Response, string) {
+	return account.info(b.server_base_endpoint, b.secret_key, b.api_key)!
+}
+
+pub fn (b Binance) account_info_pretty()! string {
+	return account.info_pretty(b.server_base_endpoint, b.secret_key, b.api_key)!
 }
 
 pub fn (b Binance) server_time() !i64 {
