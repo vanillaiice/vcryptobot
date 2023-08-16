@@ -31,4 +31,4 @@ bot_config/
 
 # Ignore logs and state
 logs/
-state
+state/
