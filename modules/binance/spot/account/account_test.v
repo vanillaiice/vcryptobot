@@ -8,7 +8,7 @@ fn test_spot_account_info() {
 	skey := os.getenv('SECRET_KEY')
 	apikey := os.getenv('API_KEY')
 
-	r := spot_account_info_pretty('testnet.binance.vision', skey, apikey)!
+	r := info_pretty('testnet.binance.vision', skey, apikey)!
 
 	println(r)
 }
