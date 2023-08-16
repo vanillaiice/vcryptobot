@@ -30,11 +30,11 @@ pub fn (b Binance) market_sell(quantity string) !(string, string) {
 		quantity)!
 }
 
-pub fn (b Binance) account_info() !(account.Response, string) {
+pub fn (b Binance) account_info() !(spot.account.Response, string) {
 	return account.info(b.server_base_endpoint, b.secret_key, b.api_key)!
 }
 
-pub fn (b Binance) account_info_pretty()! string {
+pub fn (b Binance) account_info_pretty() !string {
 	return account.info_pretty(b.server_base_endpoint, b.secret_key, b.api_key)!
 }
 

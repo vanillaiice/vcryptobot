@@ -7,14 +7,14 @@ import binance.server_time as bt
 
 struct Response {
 	symbol       string
-	order_id     int     [json: orderId]
-	executed_qty string  [json: executedQty]
+	order_id     int             [json: orderId]
+	executed_qty string          [json: executedQty]
 	status       string
 	fills        []struct {
-			price            string
-			qty              string
-			commission       string
-			commission_asset string [json: commissionAsset]
+		price            string
+		qty              string
+		commission       string
+		commission_asset string [json: commissionAsset]
 	}
 }
 
