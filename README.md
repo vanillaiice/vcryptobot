@@ -65,15 +65,10 @@ First, make sure that you have [V](https://github.com/vlang/v/blob/master/README
 - **decisionIntervalMs**, the time in milliseconds at which the bot will decide to buy or sell.
 > example value in ms: 1500
 
-- **wsServerUrl**, URL of the websocket server .
-> example URL for testnet server: "wss://testnet.binance.vision/ws-api/v3"
+- **serverBaseEndpoint**, base endpoint of the Spot API server.
+> example base endpoint for testnet server: "testnet.binance.vision"
 
-> example URL for normal server: "wss://ws-api.binance.com:443/ws-api/v3"
-
-- **serverUrl**, URL of the Spot API server.
-> example URL for testnet server: "https://testnet.binance.vision/api/v3"
-
-> example URL for normal server: "https://api.binance.com/api/v3"
+> example base endpoint for normal server: "api.binance.com"
 
 - **base**, base currency of the trading pair.
 > example value: "BTC"
