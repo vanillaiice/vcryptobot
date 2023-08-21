@@ -18,12 +18,13 @@ API_KEY = "<YOUR API KEY>"
 ```
 
 - If the .env file is not present, the .env file creation interactive prompt will be trigerred.
-- **Testnet** secret and api keys can be created at https://testnet.binance.vision/
+- **Testnet** secret and api keys can be created [here](https://testnet.binance.vision)
 
 ## Dependencies
 
 - [sqlite](https://modules.vlang.io/db.sqlite.html)
 - [zztkm.vdotenv](https://github.com/zztkm/vdotenv)
+- [vanillaiice.vbinance](https://github.com/vanillaiice/vbinance)
 - make (optional)
 - MinGW-w64 (optional, for windows cross compilation)
 
@@ -42,45 +43,61 @@ First, make sure that you have [V](https://github.com/vlang/v/blob/master/README
 
 ## Config File
 
-- **tradingBalance**, the bot's trading allowance.
-> example value for BTC: 0.0025 
+- ```base```, base currency of the trading pair.
+> example: "BTC"
 
-> example value for TRX: 500
+- ```quote```, quote currency of the trading pair.
+> example: "USDT"
 
-- **firstTx**, the type of the first transaction the bot will execute.
+- ```tradingBalance```, initial trading balance of the bot.
+> example for BTC: 0.01
+
+- ```firstTx```, type of the first transaction executed by the bot.
 > accepted values: "buy" or "sell"
 
-- **skipFirstTx**, if the bot should skip the first transaction.
+- ```skipFirstTx```, if the bot should skip the first transaction (firstTx).
 > accepted values: true or false
 
-- **buyMargin**, the margin at which the bot should buy an asset (difference between last sell price and current price).
-> example value in %: 5.0
+- ```percentChangeBuy```, percent change between the last sell price and current price, at which the bot will buy.
+> example value (%): 5.0
 
-- **sellMargin**, the margin at which the bot should sell an asset (difference between last buy price and current price).
-> example value in %: 5.0
+- ```percentChangeSell```, percent change between the current price and last buy price, at which the bot will sell.
+> example value (%): 5.0
 
-- **stopLossMargin**, the margin at which the bot should sell an asset if the price decreases compared to the last buy price (difference between last buy price and current price).
-> example value in %: 2.5
+- ```trailingStopLossMargin``` (optional), percent change between the current price and last buy price, at which the bot will sell to limit losses.
+> example value (%): 2.5
 
-- **decisionIntervalMs**, the time in milliseconds at which the bot will decide to buy or sell.
+- ```stopEntryPrice``` (optional), entry price at which the bot will buy.
+> example value for BTC: 0.011
+
+- ```stopEntryPriceMargin``` (optional), minimum percent change between the current price and the stop entry price, at which the bot will buy. 
+> example value (%): 0.1 
+
+- ```adjustTradingBalanceLoss```, if the bot should substract losses from the trading balance.
+> accepted values: true or false
+
+- ```adjustTradingBalanceProfit```, if the bot should add profits to the trading balance.
+> accepted values: true or false
+
+- ```decisionIntervalMs```, time in milliseconds at which the bot will decide to buy or sell.
 > example value in ms: 1500
 
-- **serverBaseEndpoint**, base endpoint of the Spot API server.
+- ```serverBaseEndpoint```, base endpoint of the Binance API server.
 > example base endpoint for testnet server: "testnet.binance.vision"
 
 > example base endpoint for normal server: "api.binance.com"
 
-- **base**, base currency of the trading pair.
-> example value: "BTC"
+- ```outputTarget```, output target of the content of the bot's log.
+> accepted values: "console", "file", "both"
 
-- **quote**, quote currency of the trading pair.
-> exmample value: "USDT"
-
-- **logLevel**, log level of the bot.
+- ```logLevel```, log level of the bot.
 > accepted values: "fatal", "error", "warn", "info", "debug"
 
-- **outputTarget**, output target of the content of the bot's log.
-> accepted values: "console", "file", "both"
+- ```logPriceToDb```, if the bot should log the prices fetched in a sqlite database.
+> accepted values: true or false
+
+- ```logTxToDb```, if the bot should log the transaction receipt in a sqlite database.
+> accepted values: true or false
 
 ## Acknowledgments
 
@@ -88,9 +105,8 @@ First, make sure that you have [V](https://github.com/vlang/v/blob/master/README
 
 ## Disclaimer
 
-- This project is still in alpha stage
 - No warranty whatsoever, use at your own risk
-- Trading crypto is *very* risky, only invest in what you can afford to lose
+- Trading crypto is very risky, *only invest in what you can afford to lose*
 
 ## Licence
 

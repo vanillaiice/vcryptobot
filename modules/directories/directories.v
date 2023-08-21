@@ -13,10 +13,7 @@ pub fn setup(mut logger log.Log) {
 
 	for d in dirs {
 		if os.exists(d) == false {
-			os.mkdir_all(d) or {
-				logger.error('${err}')
-				exit(1)
-			}
+			os.mkdir_all(d) or { logger.fatal('${err}') }
 			logger.debug("creating directory '${d}'")
 		}
 	}

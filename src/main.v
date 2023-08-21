@@ -4,7 +4,7 @@ import os
 import json
 import flag
 import zztkm.vdotenv
-import binance
+import vanillaiice.vbinance as binance
 import logger
 import prices
 import bot
@@ -13,8 +13,8 @@ import directories
 import metadata
 
 const (
-	n  = 'n'
-	no = 'no'
+	n         = 'n'
+	no        = 'no'
 	empty_str = ''
 )
 
@@ -24,12 +24,13 @@ fn main() {
 	fp.version(metadata.version)
 	fp.description(metadata.description)
 	fp.usage_example('vcryptobot --config config.json')
-	mut config_file := fp.string('config', `c`, empty_str, '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
+	mut config_file_path := fp.string('config', `c`, empty_str, '--config <CONFIG_FILE_NAME>.json or -c <CONFIG_FILE_NAME>.json')
 	fp.finalize()!
 
 	mut bot_config := bot.BotConfig{}
+	mut config_file := ''
 
-	if config_file == empty_str {
+	if config_file_path == empty_str {
 		ans := os.input('config file not provided, create one ? (y/N)\n-> ').to_lower()
 
 		if ans == n || ans == no {
@@ -39,11 +40,11 @@ fn main() {
 
 		bot_config = json.decode(bot.BotConfig, config.new())!
 
-		os.write_file('bot_config_${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.json',
+		os.write_file('bot_config/${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.json',
 			json.encode_pretty(bot_config))!
 	} else {
-		config_file = os.read_file(config_file) or {
-			eprintln('ERROR: error reading config file, exiting')
+		config_file = os.read_file(config_file_path) or {
+			eprintln('ERROR: error reading config file, exiting\n${err}')
 			exit(1)
 		}
 
@@ -84,13 +85,14 @@ fn main() {
 	directories.setup(mut new_logger)
 
 	mut b := binance.new(bot_config.server_base_endpoint, bot_config.base.to_upper() +
-		bot_config.quote.to_upper(), keys_map)
+		bot_config.quote.to_upper(), keys_map['SECRET_KEY'], keys_map['API_KEY'])
 	mut last_price, mut last_price_timestamp := f32(0), i64(0)
-	prices_ready := chan bool{}
+	price_received := chan bool{}
 
 	spawn prices.start(bot_config.server_base_endpoint, bot_config.decision_interval_ms,
-		bot_config.base, bot_config.quote, prices_ready, mut new_logger, mut &last_price, mut
-		&last_price_timestamp)
+		bot_config.base, bot_config.quote, bot_config.log_price_to_db, price_received, mut
+		new_logger, mut &last_price, mut &last_price_timestamp)
 
-	bot.start(&bot_config, mut b, prices_ready, mut &last_price, mut new_logger)!
+	bot.start(mut &bot_config, config_file_path, mut b, price_received, mut &last_price, mut
+		new_logger)
 }

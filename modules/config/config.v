@@ -9,7 +9,13 @@ pub fn new() string {
 	default_server_base_endpoint := 'testnet.binance.vision'
 	default_output_target := 'both'
 	default_log_level := 'info'
-	default_stop_loss_margin := '0.0'
+	default_trailing_stop_loss_margin := '0'
+	default_log_price_to_db := 'false'
+	default_log_tx_to_db := 'yes'
+	default_adjust_trading_balance_loss := 'false'
+	default_adjust_trading_balance_profit := 'false'
+	default_stop_entry_price := '0'
+	default_stop_entry_price_margin := '0'
 
 	base := is_letter_only(is_not_empty_str(input('Enter base currency symbol:\n-> ').to_upper(),
 		'Base currency'))
@@ -21,11 +27,19 @@ pub fn new() string {
 		default_first_tx))
 	skip_first_tx := is_yes_no(return_default(input('Skip first transaction (y/N) ? (default ${default_skip_first_tx}):\n-> '),
 		default_skip_first_tx))
-	buy_margin := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '), 'Buy margin'))
-	sell_margin := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '), 'Sell margin'))
-	stop_loss_margin := is_float(return_default(input('Enter stop loss margin (%), default ${default_stop_loss_margin}%:\n-> '),
-		default_stop_loss_margin))
-	decision_interval_ms := is_int(return_default(input('Enter price refresh time (milliseconds), default ${default_decision_interval_ms}:\n-> '),
+	percent_change_buy := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '), 'Buy margin'))
+	percent_change_sell := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '), 'Sell margin'))
+	trailing_stop_loss_margin := is_float(return_default(input('Enter trailing stop loss margin (%), default ${default_trailing_stop_loss_margin}%:\n-> '),
+		default_trailing_stop_loss_margin))
+	stop_entry_price := is_float(return_default(input('Enter stop entry price, default ${default_stop_entry_price}:\n-> '),
+		default_stop_entry_price))
+	stop_entry_price_margin := is_float(return_default(input('Enter stop entry price margin (%), ${default_stop_entry_price_margin}:\n-> '),
+		default_stop_entry_price_margin))
+	adjust_trading_balance_loss := is_yes_no(return_default(input('Adjust trading balance after losses (y/N) ? (default ${default_adjust_trading_balance_loss}):\n-> '),
+		default_adjust_trading_balance_loss))
+	adjust_trading_balance_profit := is_yes_no(return_default(input('Adjust trading balance after profit (y/N) ? (default ${default_adjust_trading_balance_profit}):\n-> '),
+		default_adjust_trading_balance_profit))
+	decision_interval_ms := is_int(return_default(input('Enter buy/sell decision interval (milliseconds), default ${default_decision_interval_ms}:\n-> '),
 		default_decision_interval_ms))
 	server_base_endpoint := return_default(input('Enter server base endpoint (default ${default_server_base_endpoint}):\n-> '),
 		default_server_base_endpoint)
@@ -33,20 +47,30 @@ pub fn new() string {
 		default_output_target))
 	log_level := is_log_level(return_default(input('Enter log level (fatal, error, warn, info, debug), default ${default_log_level}:\n-> '),
 		default_log_level))
+	log_price_to_db := is_yes_no(return_default(input('Log prices received in a database (y/N) ? (default ${default_log_price_to_db}):\n-> '),
+		default_log_price_to_db))
+	log_tx_to_db := is_yes_no(return_default(input('Log transaction history in a database (y/N) ? (default ${default_log_tx_to_db}):\n-> '),
+		default_log_tx_to_db))
 
 	return '{
     "base": "${base}",
     "quote": "${quote}",
-    "tradingBalance": ${trading_balance},
+    "tradingBalance": ${trading_balance:.5f},
     "firstTx": "${first_tx}",
     "skipFirstTx": "${skip_first_tx}",
-    "buyMargin": ${buy_margin},
-    "sellMargin": ${sell_margin},
-    "stopLossMargin": ${stop_loss_margin},
+    "percentChangeBuy": ${percent_change_buy:.5f},
+    "percentChangeSell": ${percent_change_sell:.5f},
+    "trailingStopLossMargin": ${trailing_stop_loss_margin:.5f},
+    "stopEntryPrice": ${stop_entry_price:.5f},
+    "stopEntryPriceMargin": ${stop_entry_price_margin:.5f}, 
+    "adjustTradingBalanceLoss": ${adjust_trading_balance_loss},
+    "adjustTradingBalanceProfit": ${adjust_trading_balance_profit},
     "decisionIntervalMs": ${decision_interval_ms},
     "serverBaseEndpoint": "${server_base_endpoint}",
     "outputTarget": "${output_target}",
-    "logLevel": "${log_level}"
+    "logLevel": "${log_level}",
+    "logPriceToDb": ${log_price_to_db},
+    "logTxToDb": ${log_tx_to_db}
   }'
 }
 
@@ -100,15 +124,13 @@ fn is_tx(tx string) string {
 	if tx in ['buy', 'sell'] {
 		return tx
 	} else {
-		eprintln('Invalid value for transacation type (buy, sell)')
+		eprintln('Invalid value for transacation type (buy, sell), exiting')
 		exit(1)
 	}
 }
 
 fn is_yes_no(str string) bool {
-	str_lower := str.to_lower()
-
-	if str_lower == 'yes' || str_lower == 'y' {
+	if str.to_lower() in ['yes', 'y'] {
 		return true
 	} else {
 		return false
@@ -119,7 +141,7 @@ fn is_output_target(target string) string {
 	if target in ['console', 'file', 'both'] {
 		return target
 	} else {
-		eprintln('Invalid value for target (console, file, both)')
+		eprintln('Invalid value for target (console, file, both), exiting')
 		exit(1)
 	}
 }
@@ -128,7 +150,7 @@ fn is_log_level(level string) string {
 	if level in ['fatal', 'error', 'warn', 'info', 'debug'] {
 		return level
 	} else {
-		eprintln('Invalid value for level (fatal, error, warn, info, debug)')
+		eprintln('Invalid value for level (fatal, error, warn, info, debug), exiting)')
 		exit(1)
 	}
 }
