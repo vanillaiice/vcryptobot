@@ -206,7 +206,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut binance_cli
 		}
 	}
 
-	bot_data.logger.warn('BOT: buying @${current_price:.5f}, price difference @${price_delta:.5f}%')
+	bot_data.logger.warn('BOT: buying @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 
 	order_status, order_resp, code := binance_client.market_buy('${bot_config.trading_balance:.5f}')
 
@@ -236,7 +236,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut binance_cli
 }
 
 fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut binance_client binance.Binance, mut bot_config BotConfig) {
-	bot_data.logger.warn('BOT: selling @${current_price:.5f}, price difference @${price_delta:.5f}%')
+	bot_data.logger.warn('BOT: selling @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 
 	order_status, order_resp, code := binance_client.market_buy('${bot_config.trading_balance:.5f}')
 
