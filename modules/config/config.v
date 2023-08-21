@@ -27,8 +27,10 @@ pub fn new() string {
 		default_first_tx))
 	skip_first_tx := is_yes_no(return_default(input('Skip first transaction (y/N) ? (default ${default_skip_first_tx}):\n-> '),
 		default_skip_first_tx))
-	percent_change_buy := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '), 'Buy margin'))
-	percent_change_sell := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '), 'Sell margin'))
+	percent_change_buy := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '),
+		'Buy margin'))
+	percent_change_sell := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '),
+		'Sell margin'))
 	trailing_stop_loss_margin := is_float(return_default(input('Enter trailing stop loss margin (%), default ${default_trailing_stop_loss_margin}%:\n-> '),
 		default_trailing_stop_loss_margin))
 	stop_entry_price := is_float(return_default(input('Enter stop entry price, default ${default_stop_entry_price}:\n-> '),

@@ -21,10 +21,10 @@ struct State {
 }
 
 pub struct BotConfig {
-	percent_change_buy                    f32    [json: percentChangeBuy]
-	percent_change_sell                   f32    [json: percentChangeSell]
+	percent_change_buy            f32    [json: percentChangeBuy]
+	percent_change_sell           f32    [json: percentChangeSell]
 	trailing_stop_loss_margin     f32    [json: trailingStopLossMargin]
-	stop_entry_price_margin  f32    [json: stopEntryPriceMargin]
+	stop_entry_price_margin       f32    [json: stopEntryPriceMargin]
 	first_tx                      LastTx [json: firstTx]
 	skip_first_tx                 bool   [json: skipFirstTx]
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
@@ -117,19 +117,27 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 			.first {
 				if bot_config.skip_first_tx == false {
 					match bot_config.first_tx {
-						.buy { buy(mut bot_data, *last_price, 0, mut binance_client, mut
-								bot_config) }
-						.sell { sell(mut bot_data, *last_price, 0, mut binance_client, mut
-								bot_config) }
-						else { 
+						.buy {
+							buy(mut bot_data, *last_price, 0, mut binance_client, mut
+								bot_config)
+						}
+						.sell {
+							sell(mut bot_data, *last_price, 0, mut binance_client, mut
+								bot_config)
+						}
+						else {
 							logger.error("BOT: tx type does not match 'buy' or 'sell', exiting")
 							exit(1)
 						}
 					}
 				} else {
 					match bot_config.first_tx {
-						.buy { bot_data.last_tx = LastTx.buy }
-						.sell { bot_data.last_tx = LastTx.sell }
+						.buy {
+							bot_data.last_tx = LastTx.buy
+						}
+						.sell {
+							bot_data.last_tx = LastTx.sell
+						}
 						else {
 							logger.error("BOT: tx type does not match 'buy' or 'sell', exiting")
 							exit(1)
