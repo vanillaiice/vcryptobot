@@ -34,7 +34,7 @@ First, make sure that you have [V](https://github.com/vlang/v/blob/master/README
 and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be installed for MacOS users) installed on your machine. Then, you can do the following:
 
 ```
-> git clone https://github.com/vanillaiice/v-crypto-bot
+> git clone https://github.com/vanillaiice/vcryptobot
 > cd v-crypto-bot
 > v install
 > v .
