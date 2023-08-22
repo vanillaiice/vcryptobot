@@ -30,7 +30,8 @@ API_KEY = "<YOUR API KEY>"
 
 ## Installation
 
-First, make sure that you have [V](https://github.com/vlang/v/blob/master/README.md#installing-v-from-source) and [sqlite](https://modules.vlang.io/db.sqlite.html) installed on your machine. Then, you can do the following:
+First, make sure that you have [V](https://github.com/vlang/v/blob/master/README.md#installing-v-from-source) 
+and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be installed for MacOS users) installed on your machine. Then, you can do the following:
 
 ```
 > git clone https://github.com/vanillaiice/v-crypto-bot
