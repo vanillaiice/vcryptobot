@@ -7,7 +7,6 @@ import log
 import db.sqlite
 import math { abs }
 import vanillaiice.vbinance as binance
-//import parse_stop_after { parse }
 
 pub enum LastTx {
 	first
@@ -19,7 +18,7 @@ struct State {
 	last_tx         LastTx [json: lastTx]
 	last_sell_price f32    [json: lastSellprice]
 	last_buy_price  f32    [json: lastBuyPrice]
-	//stop_after      string [json: stopAfter]
+	stop_after      int [json: stopAfter]
 }
 
 pub struct BotConfig {
@@ -32,7 +31,7 @@ pub struct BotConfig {
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
 	adjust_trading_balance_profit bool   [json: adjustTradingBalanceProfit]
 	log_tx_to_db                  bool   [json: logTxToDb]
-	//stop_after									  string [json: stopAfter]
+	stop_after									   int [json: stopAfter]
 pub:
 	log_price_to_db      bool   [json: logPriceToDb]
 	decision_interval_ms int    [json: decisionIntervalMs]
@@ -77,7 +76,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 			last_tx: .first
 			last_sell_price: 0
 			last_buy_price: 0
-			//stop_after: bot_config.stop_after
+			stop_after: bot_config.stop_after
 		}
 
 		os.write_file(state_file_path, json.encode_pretty(initial_state)) or {
@@ -115,8 +114,22 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 	}
 
 	logger.warn('BOT: trading ${bot_config.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy:.5f}%, SELL margin @${bot_config.percent_change_sell:.5f}%, current price @${*last_price:.5f} ${bot_config.base}/${bot_config.quote}')
-	
+
+	//WIP - do not use
+	mut stop_after_flag := false
+	mut tx_count := 0
+	if state.stop_after != 0 {
+		stop_after_flag = true
+	}
 	for {
+		if stop_after_flag == true && state.stop_after != 0 {
+			tx_count++
+			if tx_count == state.stop_after {
+				logger.warn('BOT: transaction count @${bot_config.stop_after} reached, exiting')
+				exit(0)
+			}
+		}
+		
 		match bot_data.last_tx {
 			.first {
 				if bot_config.skip_first_tx == false {
@@ -156,6 +169,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 			last_tx: bot_data.last_tx
 			last_sell_price: bot_data.last_sell_price
 			last_buy_price: bot_data.last_buy_price
+			stop_after: tx_count
 		}
 
 		os.write_file(state_file_path, json.encode_pretty(state)) or {
@@ -237,7 +251,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut binance_cli
 fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut binance_client binance.Binance, mut bot_config BotConfig) {
 	bot_data.logger.warn('BOT: selling @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 
-	order_status, order_resp, code := binance_client.market_buy('${bot_config.trading_balance:.5f}')
+	order_status, order_resp, code := binance_client.market_sell('${bot_config.trading_balance:.5f}')
 
 	if order_status != 'FILLED' {
 		bot_data.logger.error('BOT: order request returned with status "${order_status}" & code "${code}"\n${order_resp}')
