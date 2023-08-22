@@ -7,6 +7,7 @@ import log
 import db.sqlite
 import math { abs }
 import vanillaiice.vbinance as binance
+//import parse_stop_after { parse }
 
 pub enum LastTx {
 	first
@@ -18,6 +19,7 @@ struct State {
 	last_tx         LastTx [json: lastTx]
 	last_sell_price f32    [json: lastSellprice]
 	last_buy_price  f32    [json: lastBuyPrice]
+	//stop_after      string [json: stopAfter]
 }
 
 pub struct BotConfig {
@@ -30,6 +32,7 @@ pub struct BotConfig {
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
 	adjust_trading_balance_profit bool   [json: adjustTradingBalanceProfit]
 	log_tx_to_db                  bool   [json: logTxToDb]
+	//stop_after									  string [json: stopAfter]
 pub:
 	log_price_to_db      bool   [json: logPriceToDb]
 	decision_interval_ms int    [json: decisionIntervalMs]
@@ -74,6 +77,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 			last_tx: .first
 			last_sell_price: 0
 			last_buy_price: 0
+			//stop_after: bot_config.stop_after
 		}
 
 		os.write_file(state_file_path, json.encode_pretty(initial_state)) or {
@@ -82,7 +86,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 	}
 
 	state_file := os.read_file(state_file_path) or { logger.fatal('BOT: ${err}') }
-	state := json.decode(State, state_file) or { logger.fatal('BOT: ${err}') }
+	mut state := json.decode(State, state_file) or { logger.fatal('BOT: ${err}') }
 
 	mut db := sqlite.connect('db/tx_history/${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.db') or {
 		logger.fatal('BOT: ${err}')
@@ -111,7 +115,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 	}
 
 	logger.warn('BOT: trading ${bot_config.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy:.5f}%, SELL margin @${bot_config.percent_change_sell:.5f}%, current price @${*last_price:.5f} ${bot_config.base}/${bot_config.quote}')
-
+	
 	for {
 		match bot_data.last_tx {
 			.first {
@@ -126,9 +130,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 								bot_config)
 						}
 						else {
-							logger.error("BOT: tx type does not match 'buy' or 'sell', exiting")
-							exit(1)
-						}
+							logger.fatal("BOT: tx type does not match 'buy' or 'sell', exiting") }
 					}
 				} else {
 					match bot_config.first_tx {
@@ -138,10 +140,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 						.sell {
 							bot_data.last_tx = LastTx.sell
 						}
-						else {
-							logger.error("BOT: tx type does not match 'buy' or 'sell', exiting")
-							exit(1)
-						}
+						else { logger.fatal("BOT: tx type does not match 'buy' or 'sell', exiting") }
 					}
 				}
 			}
@@ -153,13 +152,13 @@ pub fn start(mut bot_config BotConfig, config_path string, mut binance_client bi
 			}
 		}
 
-		last_state := State{
+		state = State{
 			last_tx: bot_data.last_tx
 			last_sell_price: bot_data.last_sell_price
 			last_buy_price: bot_data.last_buy_price
 		}
 
-		os.write_file(state_file_path, json.encode_pretty(last_state)) or {
+		os.write_file(state_file_path, json.encode_pretty(state)) or {
 			logger.fatal('BOT: ${err}')
 		}
 
