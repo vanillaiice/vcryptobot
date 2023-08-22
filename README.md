@@ -10,7 +10,7 @@ vcryptobot --config <PATH TO CONFIG.JSON>
 ```
 
 - Omitting the ```--config``` option will trigger the config file creation interactive prompt.
-- Also, you can reate an .env file containing your binance api key and secret key in the following format:
+- Also, you can create an .env file containing your binance api key and secret key in the following format:
 
 ```
 SECRET_KEY = "<YOUR SECRET KEY>"
