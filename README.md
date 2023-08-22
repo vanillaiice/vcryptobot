@@ -97,7 +97,7 @@ and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be install
 - ```logPriceToDb```, if the bot should log the prices fetched in a sqlite database.
 > accepted values: true or false
 
-- ```logTxToDb```, if the bot should log the transaction receipt in a sqlite database.
+- ```logTxToDb```, if the bot should log the transaction receipts in a sqlite database.
 > accepted values: true or false
 
 ## Acknowledgments
