@@ -35,7 +35,7 @@ and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be install
 
 ```
 > git clone https://github.com/vanillaiice/vcryptobot
-> cd v-crypto-bot
+> cd vcryptobot
 > v install
 > v .
 // or
