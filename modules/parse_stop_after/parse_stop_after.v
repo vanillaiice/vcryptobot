@@ -8,6 +8,7 @@ enum StopAfterType {
 }
 
 struct StopAfter {
+pub:
   t f64
   stop_after_type StopAfterType
 }
