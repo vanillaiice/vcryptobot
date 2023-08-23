@@ -28,6 +28,10 @@ API_KEY = "<YOUR API KEY>"
 - make (optional)
 - MinGW-w64 (optional, for windows cross compilation)
 
+## Additional tools
+
+To view the data in the sqlite databases (prices and transaction receipts), you can install [DB Browser for sqlite](https://sqlitebrowser.org/dl/).
+
 ## Installation
 
 First, make sure that you have [V](https://github.com/vlang/v/blob/master/README.md#installing-v-from-source) 
