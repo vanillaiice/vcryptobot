@@ -116,7 +116,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 		} or { logger.fatal('BOT: ${err}') }
 	}
 
-	logger.warn('BOT: trading ${bot_config.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy:.5f}%, SELL margin @${bot_config.percent_change_sell:.5f}%, current price @${*price:.5f} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${state.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy:.5f}%, SELL margin @${bot_config.percent_change_sell:.5f}%, current price @${*price:.5f} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.state.last_tx {
@@ -216,7 +216,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 
 			tx := TxHistory{
 				@type: 'buy'
-				amount: '${bot_config.trading_balance:.5f}'
+				amount: '${bot_data.state.trading_balance:.5f}'
 				price: '${current_price:.5f}'
 				profit: '0'
 				cum_profit: '${last_profit:.5f}'
@@ -246,12 +246,12 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 
 		bot_data.state.last_tx = LastTx.sell
 		bot_data.state.last_sell_price = current_price
-		tx_trading_balance := bot_config.trading_balance
+		tx_trading_balance := bot_data.state.trading_balance
 
 		if (profit < 0 && bot_config.adjust_trading_balance_loss == true)
 			|| (profit > 0 && bot_config.adjust_trading_balance_profit == true) {
 			bot_data.state.trading_balance = '${bot_config.trading_balance + (profit / price):.5f}'.f32()
-			bot_data.logger.warn('BOT: adjusted trading balance to ${bot_config.trading_balance:.5f} ${bot_config.base}')
+			bot_data.logger.warn('BOT: adjusted trading balance to ${bot_data.state.trading_balance:.5f} ${bot_config.base}')
 		}
 
 		if bot_config.log_tx_to_db == true {
