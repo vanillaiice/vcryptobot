@@ -16,6 +16,7 @@ pub fn new() string {
 	default_adjust_trading_balance_profit := 'false'
 	default_stop_entry_price := '0'
 	default_stop_entry_price_margin := '0'
+	default_stop_after_tx := '0'
 
 	base := is_letter_only(is_not_empty_str(input('Enter base currency symbol:\n-> ').to_upper(),
 		'Base currency'))
@@ -41,6 +42,8 @@ pub fn new() string {
 		default_adjust_trading_balance_loss))
 	adjust_trading_balance_profit := is_yes_no(return_default(input('Adjust trading balance after profit (y/N) ? (default ${default_adjust_trading_balance_profit}):\n-> '),
 		default_adjust_trading_balance_profit))
+	stop_after_tx := is_int(return_default(input('Enter number of transactions to execute, default ${default_stop_after_tx}:\n-> '),
+		default_stop_after_tx))
 	decision_interval_ms := is_int(return_default(input('Enter buy/sell decision interval (milliseconds), default ${default_decision_interval_ms}:\n-> '),
 		default_decision_interval_ms))
 	server_base_endpoint := return_default(input('Enter server base endpoint (default ${default_server_base_endpoint}):\n-> '),
@@ -67,6 +70,7 @@ pub fn new() string {
     "stopEntryPriceMargin": ${stop_entry_price_margin:.5f}, 
     "adjustTradingBalanceLoss": ${adjust_trading_balance_loss},
     "adjustTradingBalanceProfit": ${adjust_trading_balance_profit},
+		"stopAfterTx": "${stop_after_tx}",
     "decisionIntervalMs": ${decision_interval_ms},
     "serverBaseEndpoint": "${server_base_endpoint}",
     "outputTarget": "${output_target}",
