@@ -24,7 +24,7 @@ pub struct BotConfig {
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
 	adjust_trading_balance_profit bool   [json: adjustTradingBalanceProfit]
 	log_tx_to_db                  bool   [json: logTxToDb]
-	stop_after                    int    [json: stopAfter]
+	stop_after_tx                 int    [json: stopAfterTx]
 	trading_balance               f32    [json: tradingBalance]
 	stop_entry_price              f32    [json: stopEntryPrice]
 pub:
@@ -39,13 +39,13 @@ pub:
 
 struct State {
 mut:
-	last_tx          LastTx [json: lastTx]
-	last_sell_price  f32    [json: lastSellprice]
-	last_buy_price   f32    [json: lastBuyPrice]
-	stop_after       int    [json: stopAfter]
-	stop_after_flag  bool   [json: stopAfterFlag]
-	trading_balance  f32    [json: tradingBalance]
-	stop_entry_price f32    [json: stopEntryPrice]
+	last_tx            LastTx [json: lastTx]
+	last_sell_price    f32    [json: lastSellprice]
+	last_buy_price     f32    [json: lastBuyPrice]
+	stop_after_tx      int    [json: stopAfterTx]
+	stop_after_tx_flag bool   [json: stopAfterTxFlag]
+	trading_balance    f32    [json: tradingBalance]
+	stop_entry_price   f32    [json: stopEntryPrice]
 }
 
 struct BotData {
@@ -72,17 +72,17 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 
 	if os.exists(state_file_path) == false {
 		logger.debug('BOT: creating state file.')
-		mut stop_after_flag := false
-		if bot_config.stop_after != 0 {
-			stop_after_flag = true
+		mut stop_after_tx_flag := false
+		if bot_config.stop_after_tx != 0 {
+			stop_after_tx_flag = true
 		}
 
 		initial_state := State{
 			last_tx: .first
 			last_sell_price: 0
 			last_buy_price: 0
-			stop_after: bot_config.stop_after
-			stop_after_flag: stop_after_flag
+			stop_after_tx: bot_config.stop_after_tx
+			stop_after_tx_flag: stop_after_tx_flag
 			trading_balance: bot_config.trading_balance
 		}
 
@@ -227,8 +227,8 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 				insert tx into TxHistory
 			} or { bot_data.logger.fatal('${err}') }
 
-			check_stop_after(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after, mut
-				bot_data.logger)
+			check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote,
+				bot_config.stop_after_tx, mut bot_data.logger)
 		}
 	}
 }
@@ -270,8 +270,8 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 				insert tx into TxHistory
 			} or { bot_data.logger.fatal('BOT: ${err}') }
 
-			check_stop_after(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after, mut
-				bot_data.logger)
+			check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote,
+				bot_config.stop_after_tx, mut bot_data.logger)
 		}
 	}
 }
@@ -291,11 +291,11 @@ fn check_price_delta_buy(a f32, b f32, c f32) (f32, bool) {
 	return delta, delta >= c
 }
 
-fn check_stop_after(mut state State, base string, quote string, stop_after int, mut logger log.Log) {
-	if state.stop_after_flag == true && state.stop_after != 0 {
-		state.stop_after--
-		if state.stop_after == 0 {
-			logger.warn('BOT: transaction count @${stop_after} reached, exiting')
+fn check_stop_after_tx(mut state State, base string, quote string, stop_after_tx int, mut logger log.Log) {
+	if state.stop_after_tx_flag == true && state.stop_after_tx != 0 {
+		state.stop_after_tx--
+		if state.stop_after_tx == 0 {
+			logger.warn('BOT: transaction count @${stop_after_tx} reached, exiting')
 			os.write_file('state/${base.to_lower()}_${quote.to_lower()}.json', json.encode_pretty(state)) or {
 				logger.fatal('BOT: ${err}')
 			}
