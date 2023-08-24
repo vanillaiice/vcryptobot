@@ -6,7 +6,7 @@ This Bot buys and sells crypto at user specified margins.
 ## Usage
 
 ```
-vcryptobot --config <PATH TO CONFIG.JSON>
+vcryptobot --config your_config.json
 ```
 
 - Omitting the ```--config``` option will trigger the config file creation interactive prompt.
@@ -69,13 +69,13 @@ and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be install
 - ```percentChangeSell```, percent change between the current price and last buy price, at which the bot will sell.
 > example value (%): 5.0
 
-- ```trailingStopLossMargin``` (optional), percent change between the current price and last buy price, at which the bot will sell to limit losses.
+- ```trailingStopLossMargin``` (optional, default 0), percent change between the current price and last buy price, at which the bot will sell to limit losses.
 > example value (%): 2.5
 
-- ```stopEntryPrice``` (optional), entry price at which the bot will buy.
+- ```stopEntryPrice``` (optional, default 0), entry price at which the bot will buy.
 > example value for BTC: 0.011
 
-- ```stopEntryPriceMargin``` (optional), minimum percent change between the current price and the stop entry price, at which the bot will buy. 
+- ```stopEntryPriceMargin``` (optional, default 0), minimum percent change between the current price and the stop entry price, at which the bot will buy. 
 > example value (%): 0.1 
 
 - ```adjustTradingBalanceLoss```, if the bot should substract losses from the trading balance.
@@ -83,6 +83,9 @@ and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be install
 
 - ```adjustTradingBalanceProfit```, if the bot should add profits to the trading balance.
 > accepted values: true or false
+
+- ```stopAfterTx``` (optional, default 0), the number of transactions that the bot will execute.
+> example: 5
 
 - ```decisionIntervalMs```, time in milliseconds at which the bot will decide to buy or sell.
 > example value in ms: 1500
