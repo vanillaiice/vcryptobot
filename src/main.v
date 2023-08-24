@@ -40,6 +40,10 @@ fn main() {
 
 		bot_config = json.decode(bot.BotConfig, config.new())!
 
+		if os.exists('bot_config') == false {
+			os.mkdir('bot_config')!
+		}
+
 		os.write_file('bot_config/${bot_config.base.to_lower()}_${bot_config.quote.to_lower()}.json',
 			json.encode_pretty(bot_config))!
 	} else {
