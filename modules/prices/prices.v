@@ -134,16 +134,3 @@ fn handle_message(msg string, mut price &f32, mut price_timestamp &i64, mut logg
 		}
 	}
 }
-
-/*
-fn get_latest_price_from_db(mut db sqlite.DB) (f32, i64) {
-	row := db.exec('select * from prices order by id desc limit 1') or { return 0, 0 }
-
-	if row.len > 0 {
-		p, t := row[0].vals[1].f32(), row[0].vals[2].i64()
-		return p, t
-	} else {
-		return 0, 0
-	}
-}
-*/
