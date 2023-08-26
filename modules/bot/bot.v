@@ -256,7 +256,7 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 		}
 
 		if bot_config.log_tx_to_db == true {
-			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['sell', '${quantity:.5f}', '${current_price:.5f}', profit.str()])
+			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['sell', '${quantity:.5f}', '${current_price:.5f}', '${profit:.5f}'])
 		}
 		
 		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote,
