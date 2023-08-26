@@ -45,6 +45,7 @@ mut:
 	stop_after_tx_flag bool   [json: stopAfterTxFlag]
 	trading_balance    f32    [json: tradingBalance]
 	stop_entry_price   f32    [json: stopEntryPrice]
+	symbol string
 	symbol_step_size   string [json: symbolStepSize]
 }
 
@@ -91,6 +92,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 			stop_after_tx: bot_config.stop_after_tx
 			stop_after_tx_flag: stop_after_tx_flag
 			trading_balance: bot_config.trading_balance
+			symbol: symbol
 			symbol_step_size: step_size[symbol]
 		}
 
@@ -212,7 +214,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	bot_data.logger.warn('BOT: buying @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 	quantity := '${binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64()):.5f}'
 	
-	order_status, order_resp, code := client.market_buy(quantity) or { 
+	order_status, order_resp, code := client.market_buy(quantity, bot_data.state.symbol) or { 
 		bot_data.logger.error("BOT: ${err}")
 		return 
 	}
@@ -237,7 +239,7 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 	quantity := binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64())
 	trading_balance := (bot_data.state.trading_balance - quantity) + quantity
 	
-	order_status, order_resp, code := client.market_sell('${quantity:.5f}') or { 
+	order_status, order_resp, code := client.market_sell('${quantity:.5f}', bot_data.state.symbol) or { 
 		bot_data.logger.error("BOT: ${err}")
 		return 
 	}

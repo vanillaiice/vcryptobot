@@ -88,8 +88,7 @@ fn main() {
 
 	directories.setup(mut new_logger)
 
-	mut b := binance.new(bot_config.server_base_endpoint, bot_config.base.to_upper() +
-		bot_config.quote.to_upper(), keys_map['SECRET_KEY'], keys_map['API_KEY'])
+	mut b := binance.new(bot_config.server_base_endpoint, keys_map['SECRET_KEY'], keys_map['API_KEY'])
 	mut last_price, mut last_price_timestamp := f32(0), i64(0)
 	price_received := chan bool{}
 
