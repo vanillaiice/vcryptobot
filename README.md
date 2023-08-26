@@ -116,6 +116,10 @@ and [sqlite](https://modules.vlang.io/db.sqlite.html) (should already be install
 - No warranty whatsoever, use at your own risk
 - Trading crypto is very risky, *only invest in what you can afford to lose*
 
+## Author
+
+Vanillaiice
+
 ## Licence
 
 BSD-3-Clause
