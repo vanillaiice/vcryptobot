@@ -18,7 +18,7 @@ pub fn new(log_level string, output_target string, base string, quote string) !&
 		level: level
 	}
 
-	if target == .file || target == .both {
+	if target in [.file, .both] {
 		if os.exists('logs') == false {
 			os.mkdir('logs')!
 		}
