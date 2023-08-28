@@ -22,21 +22,21 @@ pub fn new() string {
 		'Base currency'))
 	quote := is_letter_only(is_not_empty_str(input('Enter quote currency symbol:\n-> ').to_upper(),
 		'Quote currency'))
-	trading_balance := is_float(is_not_empty_str(input('Enter bot trading balance:\n-> '),
+	trading_balance := is_float_str(is_not_empty_str(input('Enter bot trading balance:\n-> '),
 		'Trading balance'))
 	first_tx := is_tx(return_default(input('Enter type of first transaction (buy or sell), default ${default_first_tx}:\n-> '),
 		default_first_tx))
 	skip_first_tx := is_yes_no(return_default(input('Skip first transaction (y/N) ? (default ${default_skip_first_tx}):\n-> '),
 		default_skip_first_tx))
-	percent_change_buy := is_float(is_not_empty_str(input('Enter buy margin (%):\n-> '),
+	percent_change_buy := is_float_str(is_not_empty_str(input('Enter buy margin (%):\n-> '),
 		'Buy margin'))
-	percent_change_sell := is_float(is_not_empty_str(input('Enter sell margin (%):\n-> '),
+	percent_change_sell := is_float_str(is_not_empty_str(input('Enter sell margin (%):\n-> '),
 		'Sell margin'))
-	trailing_stop_loss_margin := is_float(return_default(input('Enter trailing stop loss margin (%), default ${default_trailing_stop_loss_margin}%:\n-> '),
+	trailing_stop_loss_margin := is_float_str(return_default(input('Enter trailing stop loss margin (%), default ${default_trailing_stop_loss_margin}%:\n-> '),
 		default_trailing_stop_loss_margin))
-	stop_entry_price := is_float(return_default(input('Enter stop entry price, default ${default_stop_entry_price}:\n-> '),
+	stop_entry_price := is_float_str(return_default(input('Enter stop entry price, default ${default_stop_entry_price}:\n-> '),
 		default_stop_entry_price))
-	stop_entry_price_margin := is_float(return_default(input('Enter stop entry price margin (%), ${default_stop_entry_price_margin}:\n-> '),
+	stop_entry_price_margin := is_float_str(return_default(input('Enter stop entry price margin (%), ${default_stop_entry_price_margin}:\n-> '),
 		default_stop_entry_price_margin))
 	adjust_trading_balance_loss := is_yes_no(return_default(input('Adjust trading balance after losses (y/N) ? (default ${default_adjust_trading_balance_loss}):\n-> '),
 		default_adjust_trading_balance_loss))
@@ -60,14 +60,14 @@ pub fn new() string {
 	return '{
     "base": "${base}",
     "quote": "${quote}",
-    "tradingBalance": ${trading_balance:.5f},
+    "tradingBalance": "${trading_balance}",
     "firstTx": "${first_tx}",
     "skipFirstTx": "${skip_first_tx}",
-    "percentChangeBuy": ${percent_change_buy:.5f},
-    "percentChangeSell": ${percent_change_sell:.5f},
-    "trailingStopLossMargin": ${trailing_stop_loss_margin:.5f},
-    "stopEntryPrice": ${stop_entry_price:.5f},
-    "stopEntryPriceMargin": ${stop_entry_price_margin:.5f}, 
+    "percentChangeBuy": "${percent_change_buy}",
+    "percentChangeSell": "${percent_change_sell}",
+    "trailingStopLossMargin": "${trailing_stop_loss_margin}",
+    "stopEntryPrice": "${stop_entry_price}",
+    "stopEntryPriceMargin": "${stop_entry_price_margin}", 
     "adjustTradingBalanceLoss": ${adjust_trading_balance_loss},
     "adjustTradingBalanceProfit": ${adjust_trading_balance_profit},
 		"stopAfterTx": "${stop_after_tx}",
@@ -97,13 +97,13 @@ fn is_not_empty_str(str string, description string) string {
 	return str
 }
 
-fn is_float(num string) f32 {
+fn is_float_str(num string) string {
 	if num.contains_only('0123456789.') == false {
 		eprintln("${num} should only contain digits or '.', exiting")
 		exit(1)
 	}
 
-	return num.f32()
+	return num
 }
 
 fn is_int(num string) int {

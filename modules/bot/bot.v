@@ -14,18 +14,18 @@ pub enum LastTx {
 }
 
 pub struct BotConfig {
-	percent_change_buy            f32    [json: percentChangeBuy]
-	percent_change_sell           f32    [json: percentChangeSell]
-	trailing_stop_loss_margin     f32    [json: trailingStopLossMargin]
-	stop_entry_price_margin       f32    [json: stopEntryPriceMargin]
+	percent_change_buy            string    [json: percentChangeBuy]
+	percent_change_sell           string    [json: percentChangeSell]
+	trailing_stop_loss_margin     string    [json: trailingStopLossMargin]
+	stop_entry_price_margin       string    [json: stopEntryPriceMargin]
 	first_tx                      LastTx [json: firstTx]
 	skip_first_tx                 bool   [json: skipFirstTx]
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
 	adjust_trading_balance_profit bool   [json: adjustTradingBalanceProfit]
 	log_tx_to_db                  bool   [json: logTxToDb]
 	stop_after_tx                 int    [json: stopAfterTx]
-	trading_balance               f32    [json: tradingBalance]
-	stop_entry_price              f32    [json: stopEntryPrice]
+	trading_balance               string    [json: tradingBalance]
+	stop_entry_price              string    [json: stopEntryPrice]
 pub:
 	log_price_to_db      bool   [json: logPriceToDb]
 	decision_interval_ms int    [json: decisionIntervalMs]
@@ -91,7 +91,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 			last_buy_price: 0
 			stop_after_tx: bot_config.stop_after_tx
 			stop_after_tx_flag: stop_after_tx_flag
-			trading_balance: bot_config.trading_balance
+			trading_balance: bot_config.trading_balance.f32()
 			symbol: symbol
 			symbol_step_size: step_size[symbol]
 		}
@@ -126,7 +126,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 		} or { logger.fatal('BOT: ${err}') }
 	}
 
-	logger.warn('BOT: trading ${state.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy:.5f}%, SELL margin @${bot_config.percent_change_sell:.5f}%, current price @${*price:.5f} ${bot_config.base}/${bot_config.quote}')
+	logger.warn('BOT: trading ${state.trading_balance:.5f} ${bot_config.base}/${bot_config.quote}, BUY margin @${bot_config.percent_change_buy}%, SELL margin @${bot_config.percent_change_sell}%, current price @${*price:.5f} ${bot_config.base}/${bot_config.quote}')
 
 	for {
 		match bot_data.state.last_tx {
@@ -175,7 +175,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 
 fn try_buy_tx(mut bot_data BotData, mut current_price &f32, mut client binance.Binance, mut bot_config BotConfig) {
 	delta, res := check_price_delta_buy(bot_data.state.last_sell_price, *current_price,
-		bot_config.percent_change_buy)
+		bot_config.percent_change_buy.f32())
 	if res == true {
 		buy(mut bot_data, *current_price, -delta, mut client, mut bot_config)
 	} else {
@@ -185,11 +185,11 @@ fn try_buy_tx(mut bot_data BotData, mut current_price &f32, mut client binance.B
 
 fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut client binance.Binance, mut bot_config BotConfig) {
 	delta, res := check_price_delta_sell(bot_data.state.last_buy_price, *current_price,
-		bot_config.percent_change_sell)
+		bot_config.percent_change_sell.f32())
 	if res == true {
 		sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 	} else {
-		if delta <= -bot_config.trailing_stop_loss_margin {
+		if delta <= -bot_config.trailing_stop_loss_margin.f32() {
 			bot_data.logger.warn('BOT: triggering STOP LOSS order')
 			sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 		} else {
@@ -200,8 +200,8 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut client binance.
 
 fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client binance.Binance, mut bot_config BotConfig) {
 	if bot_data.state.stop_entry_price != 0 {
-		delta := abs((bot_config.stop_entry_price - current_price) * 100 / current_price)
-		if delta >= bot_config.stop_entry_price_margin {
+		delta := abs((bot_config.stop_entry_price.f32() - current_price) * 100 / current_price)
+		if delta >= bot_config.stop_entry_price_margin.f32() {
 			bot_data.logger.info('BOT: not buying, difference between price and stop entry price @${delta:.5f}')
 			return
 		} else {
