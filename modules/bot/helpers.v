@@ -8,7 +8,7 @@ import time
 
 fn insert_tx_in_db(mut db sqlite.DB, mut logger log.Log, fields []string) {
 	last_profit := get_last_profit_from_db(mut db)
-	tx := TxHistory {
+	tx := TxHistory{
 		@type: fields[0]
 		amount: fields[1]
 		price: fields[2]

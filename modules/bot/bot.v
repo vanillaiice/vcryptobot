@@ -14,18 +14,18 @@ pub enum LastTx {
 }
 
 pub struct BotConfig {
-	percent_change_buy            string    [json: percentChangeBuy]
-	percent_change_sell           string    [json: percentChangeSell]
-	trailing_stop_loss_margin     string    [json: trailingStopLossMargin]
-	stop_entry_price_margin       string    [json: stopEntryPriceMargin]
+	percent_change_buy            string [json: percentChangeBuy]
+	percent_change_sell           string [json: percentChangeSell]
+	trailing_stop_loss_margin     string [json: trailingStopLossMargin]
+	stop_entry_price_margin       string [json: stopEntryPriceMargin]
 	first_tx                      LastTx [json: firstTx]
 	skip_first_tx                 bool   [json: skipFirstTx]
 	adjust_trading_balance_loss   bool   [json: adjustTradingBalanceLoss]
 	adjust_trading_balance_profit bool   [json: adjustTradingBalanceProfit]
 	log_tx_to_db                  bool   [json: logTxToDb]
 	stop_after_tx                 int    [json: stopAfterTx]
-	trading_balance               string    [json: tradingBalance]
-	stop_entry_price              string    [json: stopEntryPrice]
+	trading_balance               string [json: tradingBalance]
+	stop_entry_price              string [json: stopEntryPrice]
 pub:
 	log_price_to_db      bool   [json: logPriceToDb]
 	decision_interval_ms int    [json: decisionIntervalMs]
@@ -45,7 +45,7 @@ mut:
 	stop_after_tx_flag bool   [json: stopAfterTxFlag]
 	trading_balance    f32    [json: tradingBalance]
 	stop_entry_price   f32    [json: stopEntryPrice]
-	symbol string
+	symbol             string
 	symbol_step_size   string [json: symbolStepSize]
 }
 
@@ -73,17 +73,15 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 
 	if os.exists(state_file_path) == false {
 		logger.debug('BOT: creating state file.')
-		
+
 		mut stop_after_tx_flag := false
-		
+
 		if bot_config.stop_after_tx != 0 {
 			stop_after_tx_flag = true
 		}
-		
+
 		symbol := bot_config.base.to_upper() + bot_config.quote.to_upper()
-		step_size, _ := client.step_size([symbol]) or {
-			logger.fatal("BOT: ${err}")
-		}
+		step_size, _ := client.step_size([symbol]) or { logger.fatal('BOT: ${err}') }
 
 		initial_state := State{
 			last_tx: .first
@@ -213,10 +211,10 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 
 	bot_data.logger.warn('BOT: buying @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 	quantity := '${binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64()):.5f}'
-	
-	order, order_resp, code := client.market_buy(quantity, bot_data.state.symbol) or { 
-		bot_data.logger.error("BOT: ${err}")
-		return 
+
+	order, order_resp, code := client.market_buy(quantity, bot_data.state.symbol) or {
+		bot_data.logger.error('BOT: ${err}')
+		return
 	}
 
 	if order.status != 'FILLED' {
@@ -226,10 +224,12 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 		bot_data.state.last_buy_price = order.fills[0].price.f32()
 
 		if bot_config.log_tx_to_db == true {
-			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['buy', quantity, '${bot_data.state.last_buy_price:.5f}', '0'])
+			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['buy', quantity,
+				'${bot_data.state.last_buy_price:.5f}', '0'])
 		}
-		
-		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after_tx, mut bot_data.logger)
+
+		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after_tx, mut
+			bot_data.logger)
 	}
 }
 
@@ -238,10 +238,10 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 
 	quantity := binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64())
 	trading_balance := (bot_data.state.trading_balance - quantity) + quantity
-	
-	order, order_resp, code := client.market_sell('${quantity:.5f}', bot_data.state.symbol) or { 
-		bot_data.logger.error("BOT: ${err}")
-		return 
+
+	order, order_resp, code := client.market_sell('${quantity:.5f}', bot_data.state.symbol) or {
+		bot_data.logger.error('BOT: ${err}')
+		return
 	}
 
 	if order.status != 'FILLED' {
@@ -249,19 +249,21 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 	} else {
 		bot_data.state.last_sell_price = order.fills[0].price.f32()
 		bot_data.state.last_tx = LastTx.sell
-		profit := (bot_data.state.last_sell_price - bot_data.state.last_buy_price) * (quantity)
+		profit := (bot_data.state.last_sell_price - bot_data.state.last_buy_price) * quantity
 
 		if (profit < 0 && bot_config.adjust_trading_balance_loss == true)
 			|| (profit > 0 && bot_config.adjust_trading_balance_profit == true) {
-			bot_data.state.trading_balance = '${trading_balance + (profit / bot_data.state.last_sell_price):.5f}'.f32()
+			bot_data.state.trading_balance = '${trading_balance +
+				(profit / bot_data.state.last_sell_price):.5f}'.f32()
 			bot_data.logger.warn('BOT: adjusted trading balance to ${bot_data.state.trading_balance:.5f} ${bot_config.base}')
 		}
 
 		if bot_config.log_tx_to_db == true {
-			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['sell', '${quantity:.5f}', '${bot_data.state.last_sell_price:.5f}', '${profit:.5f}'])
+			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['sell', '${quantity:.5f}',
+				'${bot_data.state.last_sell_price:.5f}', '${profit:.5f}'])
 		}
-		
-		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote,
-			bot_config.stop_after_tx, mut bot_data.logger)
+
+		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after_tx, mut
+			bot_data.logger)
 	}
 }
