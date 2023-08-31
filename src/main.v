@@ -6,7 +6,7 @@ import flag
 import zztkm.vdotenv
 import vanillaiice.vbinance as binance
 import logger
-import prices
+import price_websocket as price_ws
 import bot
 import config
 import directories
@@ -92,7 +92,7 @@ fn main() {
 	mut last_price, mut last_price_timestamp := f32(0), i64(0)
 	price_received := chan bool{}
 
-	spawn prices.start(bot_config.server_base_endpoint, bot_config.decision_interval_ms,
+	spawn price_ws.start(bot_config.server_base_endpoint, bot_config.decision_interval_ms,
 		bot_config.base, bot_config.quote, bot_config.log_price_to_db, price_received, mut
 		new_logger, mut &last_price, mut &last_price_timestamp)
 
