@@ -187,7 +187,7 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut client binance.
 	if res == true {
 		sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 	} else {
-		if delta <= -bot_config.trailing_stop_loss_margin.f32() {
+		if delta <= -bot_config.trailing_stop_loss_margin.f32() &&  bot_config.trailing_stop_loss_margin.f32() != 0 {
 			bot_data.logger.warn('BOT: triggering STOP LOSS order')
 			sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 		} else {
