@@ -6,14 +6,14 @@ import json
 import log
 import time
 
-fn insert_tx_in_db(mut db sqlite.DB, mut logger log.Log, fields []string) {
+fn insert_tx_in_db(mut db sqlite.DB, mut logger log.Log, tx_type string, fields []f64) {
 	last_profit := get_last_profit_from_db(mut db)
 	tx := TxHistory{
-		@type: fields[0]
-		amount: fields[1]
-		price: fields[2]
-		profit: fields[3]
-		cum_profit: '${last_profit + fields[3].f32():.5f}'
+		@type: tx_type
+		amount: fields[0]
+		price: fields[1]
+		profit: fields[2]
+		cum_profit: last_profit + fields[2]
 		timestamp: time.now().unix_time()
 	}
 

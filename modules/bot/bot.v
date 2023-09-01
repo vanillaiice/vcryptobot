@@ -61,11 +61,11 @@ mut:
 struct TxHistory {
 	id         int    [primary; sql: serial]
 	@type      string [nonull]
-	amount     string [nonull]
-	price      string [nonull]
-	profit     string [nonull]
-	cum_profit string [nonull]
-	timestamp  i64    [nonull]
+	amount     f64    [nonull]
+	price      f64    [nonull]
+	profit     f64    [nonull]
+	cum_profit f64    [nonull]
+	timestamp  i64    [nonull; sql_type: 'TIMESTAMP']
 }
 
 pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Binance, price_received chan bool, mut price &f32, mut logger log.Log) {
@@ -210,9 +210,9 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	}
 
 	bot_data.logger.warn('BOT: buying @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
-	quantity := '${binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64()):.5f}'
+	quantity := binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64())
 
-	order, order_resp, code := client.market_buy(quantity, bot_data.state.symbol) or {
+	order, order_resp, code := client.market_buy(quantity.str(), bot_data.state.symbol) or {
 		bot_data.logger.error('BOT: ${err}')
 		return
 	}
@@ -224,8 +224,8 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 		bot_data.state.last_buy_price = order.fills[0].price.f32()
 
 		if bot_config.log_tx_to_db == true {
-			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['buy', quantity,
-				'${bot_data.state.last_buy_price:.5f}', '0'])
+			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, 'buy', [quantity, bot_data.state.last_buy_price,
+				0])
 		}
 
 		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after_tx, mut
@@ -259,8 +259,8 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 		}
 
 		if bot_config.log_tx_to_db == true {
-			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, ['sell', '${quantity:.5f}',
-				'${bot_data.state.last_sell_price:.5f}', '${profit:.5f}'])
+			insert_tx_in_db(mut bot_data.db, mut bot_data.logger, 'sell', [quantity, bot_data.state.last_sell_price,
+				profit])
 		}
 
 		check_stop_after_tx(mut bot_data.state, bot_config.base, bot_config.quote, bot_config.stop_after_tx, mut
