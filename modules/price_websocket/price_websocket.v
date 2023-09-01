@@ -8,7 +8,7 @@ import log
 
 [table: 'prices']
 struct Price {
-	id        int    [primary; sql: serial]
+	id        int [primary; sql: serial]
 	price     f64 [nonull]
 	timestamp i64 [nonull; sql_type: 'TIMESTAMP']
 }
@@ -91,17 +91,17 @@ fn handle_message(msg string, mut price &f32, mut price_timestamp &i64, mut logg
 	msg_json := json.decode(PriceResponse, msg)!
 
 	match msg_json.status {
-		slow_down {
+		price_websocket.slow_down {
 			logger.warn('PRICES: received status code 429 (slow down API calls), exiting')
 			logger.debug(msg_json.str())
 			exit(1)
 		}
-		ip_banned {
+		price_websocket.ip_banned {
 			logger.warn('PRICES: received status code 418 (IP address banned), exiting')
 			logger.debug(msg_json.str())
 			exit(1)
 		}
-		ok {
+		price_websocket.ok {
 			p := msg_json.result.price.f32()
 			if p != 0 {
 				price = p
