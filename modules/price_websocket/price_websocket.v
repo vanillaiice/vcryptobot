@@ -7,13 +7,13 @@ import db.sqlite
 import log
 
 [table: 'prices']
-struct Prices {
+struct Price {
 	id        int    [primary; sql: serial]
-	price     string [nonull]
-	timestamp string [nonull]
+	price     f64 [nonull]
+	timestamp i64 [nonull; sql_type: 'TIMESTAMP']
 }
 
-struct Price {
+struct PriceResponse {
 	id     string
 	status int
 	result struct {
@@ -49,7 +49,7 @@ pub fn start(server_url string, refresh_time_ms int, base string, quote string, 
 	db.journal_mode(sqlite.JournalMode.memory) or { logger.fatal('PRICES: ${err}') }
 
 	sql db {
-		create table Prices
+		create table Price
 	} or { logger.fatal('PRICES: ${err}') }
 
 	setup_client(mut ws, mut last_price, mut last_price_timestamp, mut logger, mut &db,
@@ -88,7 +88,7 @@ fn fetch_price(mut ws websocket.Client, refresh_time_ms int, symbol string) ! {
 }
 
 fn handle_message(msg string, mut price &f32, mut price_timestamp &i64, mut logger log.Log, mut db sqlite.DB, price_received chan bool, log_price_to_db bool) ! {
-	msg_json := json.decode(Price, msg)!
+	msg_json := json.decode(PriceResponse, msg)!
 
 	match msg_json.status {
 		slow_down {
@@ -111,13 +111,13 @@ fn handle_message(msg string, mut price &f32, mut price_timestamp &i64, mut logg
 				logger.debug('PRICES: received @${*price:.5f}')
 
 				if log_price_to_db == true {
-					row := Prices{
-						price: '${p:.5f}'
-						timestamp: (*price_timestamp).str()
+					row := Price{
+						price: p
+						timestamp: price_timestamp
 					}
 
 					sql db {
-						insert row into Prices
+						insert row into Price
 					} or {
 						logger.error('PRICES: ${err}')
 						return
