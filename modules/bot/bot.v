@@ -187,7 +187,7 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut client binance.
 	if res == true {
 		sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 	} else {
-		if delta <= -bot_config.trailing_stop_loss_margin.f32() &&  bot_config.trailing_stop_loss_margin.f32() != 0 {
+		if delta <= -bot_config.trailing_stop_loss_margin.f32() && bot_config.trailing_stop_loss_margin.f32() != 0 {
 			bot_data.logger.warn('BOT: triggering STOP LOSS order')
 			sell(mut bot_data, *current_price, delta, mut client, mut bot_config)
 		} else {
@@ -212,7 +212,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	bot_data.logger.warn('BOT: buying @${current_price:.5f} ${bot_config.base}/${bot_config.quote}, price difference @${price_delta:.5f}%')
 	quantity := binance.round_step_size(bot_data.state.trading_balance, bot_data.state.symbol_step_size.f64())
 
-	order, order_resp, code := client.market_buy(quantity.str(), bot_data.state.symbol) or {
+	order, order_resp, code := client.market_buy('${quantity:.5f}', bot_data.state.symbol) or {
 		bot_data.logger.error('BOT: ${err}')
 		return
 	}
