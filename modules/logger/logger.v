@@ -14,7 +14,7 @@ pub fn new(log_level string, output_target string, base string, quote string) !&
 		exit(1)
 	}
 
-	mut logger := log.Log{
+	mut logger_ := log.Log{
 		level: level
 	}
 
@@ -23,12 +23,12 @@ pub fn new(log_level string, output_target string, base string, quote string) !&
 			os.mkdir('logs')!
 		}
 
-		logger.set_full_logpath('logs/${base.to_lower()}_${quote.to_lower()}.txt')
+		logger_.set_full_logpath('logs/${base.to_lower()}_${quote.to_lower()}.txt')
 
 		if target == .both {
-			logger.log_to_console_too()
+			logger_.log_to_console_too()
 		}
 	}
 
-	return &logger
+	return &logger_
 }
