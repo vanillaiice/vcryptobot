@@ -220,6 +220,7 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	if order.status != 'FILLED' {
 		bot_data.logger.error('BOT: order request returned with status "${order.status}" & code "${code}"\n${order_resp}')
 	} else {
+		bot_data.logger.info('BOT: bought ${order.executed_qty} ${bot_config.base} @{order.price} ${bot_config.quote}')
 		bot_data.state.last_tx = LastTx.buy
 		bot_data.state.last_buy_price = order.fills[0].price.f32()
 
@@ -247,9 +248,13 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 	if order.status != 'FILLED' {
 		bot_data.logger.error('BOT: order request returned with status "${order.status}" & code "${code}"\n${order_resp}')
 	} else {
+		mut profit := f64(0)
 		bot_data.state.last_sell_price = order.fills[0].price.f32()
+		if bot_data.state.last_tx != .first {
+			profit = (bot_data.state.last_sell_price - bot_data.state.last_buy_price) * quantity
+		}
+		bot_data.logger.info('BOT: sold ${order.executed_qty} ${bot_config.base} @${order.price} ${bot_config.quote}, with profit of ${profit:.5f} ${bot_config.base}')
 		bot_data.state.last_tx = LastTx.sell
-		profit := (bot_data.state.last_sell_price - bot_data.state.last_buy_price) * quantity
 
 		if (profit < 0 && bot_config.adjust_trading_balance_loss == true)
 			|| (profit > 0 && bot_config.adjust_trading_balance_profit == true) {
