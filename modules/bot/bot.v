@@ -32,7 +32,6 @@ pub:
 	output_target        string [json: outputTarget]
 	log_level            string [json: logLevel]
 	server_base_endpoint string [json: serverBaseEndpoint]
-	ws_server_base_endpoint string [json: wsServerBaseEndpoint]
 	base                 string
 	quote                string
 }
