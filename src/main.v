@@ -92,7 +92,7 @@ fn main() {
 	mut last_price, mut last_price_timestamp := f32(0), i64(0)
 	price_received := chan bool{}
 
-	spawn price_ws.start(bot_config.server_base_endpoint, bot_config.decision_interval_ms,
+	spawn price_ws.start(bot_config.ws_server_base_endpoint, bot_config.decision_interval_ms,
 		bot_config.base, bot_config.quote, bot_config.log_price_to_db, price_received, mut
 		new_logger, mut &last_price, mut &last_price_timestamp)
 

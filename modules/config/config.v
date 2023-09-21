@@ -7,6 +7,7 @@ pub fn new() string {
 	default_first_tx := 'buy'
 	default_skip_first_tx := 'false'
 	default_server_base_endpoint := 'testnet.binance.vision'
+	default_ws_server_base_endpoint := 'testnet.binance.vision'
 	default_output_target := 'both'
 	default_log_level := 'info'
 	default_trailing_stop_loss_margin := '0'
@@ -48,6 +49,8 @@ pub fn new() string {
 		default_decision_interval_ms))
 	server_base_endpoint := return_default(input('Enter server base endpoint (default ${default_server_base_endpoint}):\n-> '),
 		default_server_base_endpoint)
+	ws_server_base_endpoint := return_default(input('Enter websocket server base endpoint (default ${default_ws_server_base_endpoint}):\n-> '),
+		default_ws_server_base_endpoint)
 	output_target := is_output_target(return_default(input('Enter log output target (console, file, both), default ${default_output_target}:\n-> '),
 		default_output_target))
 	log_level := is_log_level(return_default(input('Enter log level (fatal, error, warn, info, debug), default ${default_log_level}:\n-> '),
@@ -73,6 +76,7 @@ pub fn new() string {
 		"stopAfterTx": "${stop_after_tx}",
     "decisionIntervalMs": ${decision_interval_ms},
     "serverBaseEndpoint": "${server_base_endpoint}",
+    "wsServerBaseEndpoint": "${ws_server_base_endpoint}",
     "outputTarget": "${output_target}",
     "logLevel": "${log_level}",
     "logPriceToDb": ${log_price_to_db},
