@@ -91,6 +91,7 @@ pub fn start(mut bot_config BotConfig, config_path string, mut client binance.Bi
 			stop_after_tx: bot_config.stop_after_tx
 			stop_after_tx_flag: stop_after_tx_flag
 			trading_balance: bot_config.trading_balance.f32()
+			stop_entry_price: bot_config.stop_entry_price.f32()
 			symbol: symbol
 			symbol_step_size: step_size[symbol]
 		}
@@ -201,14 +202,11 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	if bot_data.state.stop_entry_price != 0 {
 		delta := abs((bot_config.stop_entry_price.f32() - current_price) * 100 / bot_config.stop_entry_price.f32())
 		stop_entry_price_margin := bot_config.stop_entry_price_margin.f32()
-		if delta > stop_entry_price_margin {
-			bot_data.logger.info('BOT: not buying, difference between price and stop entry price @${delta:.5f}')
+		if delta >= stop_entry_price_margin {
+			bot_data.logger.info('BOT: not buying, difference between price and stop entry price @${delta:.5f}%')
 			return
 		} else {
 			bot_data.logger.warn('BOT: triggering STOP ENTRY order')
-// do this only if order is filled
-			bot_data.state.stop_entry_price = 0
-			bot_data.logger.debug('BOT: reset stop entry balance to 0')
 		}
 	}
 
@@ -223,6 +221,11 @@ fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client bina
 	if order.status != 'FILLED' {
 		bot_data.logger.error('BOT: order request returned with status "${order.status}" & code "${code}"\n${order_resp}')
 	} else {
+		if bot_data.state.stop_entry_price != 0 {
+			bot_data.state.stop_entry_price = 0
+			bot_data.logger.debug('BOT: reset stop entry balance to 0')
+		}
+
 		bot_data.logger.info('BOT: bought ${order.executed_qty} ${bot_config.base} @{order.price} ${bot_config.quote}')
 		bot_data.state.last_tx = LastTx.buy
 		bot_data.state.last_buy_price = order.fills[0].price.f32()
