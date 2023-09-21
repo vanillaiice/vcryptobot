@@ -199,7 +199,7 @@ fn try_sell_tx(mut bot_data BotData, mut current_price &f32, mut client binance.
 
 fn buy(mut bot_data BotData, current_price f32, price_delta f32, mut client binance.Binance, mut bot_config BotConfig) {
 	if bot_data.state.stop_entry_price != 0 {
-		delta := abs((bot_config.stop_entry_price.f32() - current_price) * 100 / current_price)
+		delta := abs((bot_config.stop_entry_price.f32() - current_price) * 100 / bot_config.stop_entry_price.f32())
 		stop_entry_price_margin := bot_config.stop_entry_price_margin.f32()
 		if (delta >= stop_entry_price_margin && stop_entry_price_margin != 0) || delta == 0 {
 			bot_data.logger.info('BOT: not buying, difference between price and stop entry price @${delta:.5f}')
