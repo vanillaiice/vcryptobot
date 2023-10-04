@@ -82,9 +82,14 @@ fn setup_client(mut ws websocket.Client, mut price &f32, mut price_timestamp &i6
 }
 
 fn fetch_price(mut ws websocket.Client, refresh_time_ms int, symbol string) ! {
-	ws.write_string('{ "id": "0", "method": "ticker.price", "params": { "symbol": "${symbol}" } }')!
-	time.sleep(refresh_time_ms * time.millisecond)
-	fetch_price(mut ws, refresh_time_ms, symbol)!
+	mut sw := time.new_stopwatch()
+
+	for {
+		if sw.elapsed().milliseconds() >= refresh_time_ms {
+			ws.write_string('{ "id": "0", "method": "ticker.price", "params": { "symbol": "${symbol}" } }')!
+			sw.restart()
+		}
+	}
 }
 
 fn handle_message(msg string, mut price &f32, mut price_timestamp &i64, mut logger log.Log, mut db sqlite.DB, price_received chan bool, log_price_to_db bool) ! {
