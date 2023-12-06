@@ -259,7 +259,7 @@ fn sell(mut bot_data BotData, current_price f32, price_delta f32, mut client bin
 		if bot_data.state.last_tx != .first {
 			profit = (bot_data.state.last_sell_price - bot_data.state.last_buy_price) * quantity
 		}
-		bot_data.logger.info('BOT: sold ${order.executed_qty} ${bot_config.base} @${order.price} ${bot_config.quote}, with profit of ${profit:.5f} ${bot_config.base}')
+		bot_data.logger.info('BOT: sold ${order.executed_qty} ${bot_config.base} @${order.price} ${bot_config.quote}, with profit of ${profit:.5f} ${bot_config.quote}')
 		bot_data.state.last_tx = LastTx.sell
 
 		if (profit < 0 && bot_config.adjust_trading_balance_loss == true)
